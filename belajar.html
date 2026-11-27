@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -11,13 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <style>
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
             color: #0f172a;
             overflow-x: hidden;
-            margin: 0;
         }
-        .hidden { display: none !important; }
+        /* Animasi Kartu Kosakata 3D Flip */
         .flashcard-perspective {
             perspective: 1100px;
             height: 225px;
@@ -46,6 +44,7 @@
         .flashcard-back {
             transform: rotateY(180deg);
         }
+        /* Istilah Tata Bahasa Klik-Langsung */
         .grammar-term {
             font-weight: 800;
             color: #4338ca;
@@ -58,6 +57,7 @@
         .grammar-term:hover {
             background-color: #e0e7ff;
         }
+        /* Transisi Slide Presentasi */
         @keyframes slideFadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -65,13 +65,17 @@
         .presentation-slide-enter {
             animation: slideFadeIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
         }
+        /* Virtual Laser Pointer */
+        body.laser-mode, body.laser-mode * {
+            cursor: none !important;
+        }
         #efn-laser-dot {
             position: fixed;
-            width: 22px;
-            height: 22px;
+            width: 18px;
+            height: 18px;
             border-radius: 9999px;
             background: radial-gradient(circle, #ffffff 0%, #ef4444 45%, rgba(239, 68, 68, 0) 100%);
-            box-shadow: 0 0 16px 5px rgba(239, 68, 68, 0.85);
+            box-shadow: 0 0 14px 4px rgba(239, 68, 68, 0.85);
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
@@ -80,11 +84,15 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
-    <div id="efn-laser-dot" aria-hidden="true"></div>
+    <!-- Titik Laser Virtual Proyektor -->
+    <div id="efn-laser-dot"></div>
 
-    <!-- TOP STICKY NAVIGATION -->
+    <!-- ===================================================================== -->
+    <!-- TOP STICKY NAVIGATION (SATU BARIS MENYATU & RAPI)                     -->
+    <!-- ===================================================================== -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap">
+            <!-- Brand -->
             <button type="button" id="efn-brand-btn"
                 class="flex items-center gap-2 text-left px-2 py-1.5 rounded-xl hover:bg-slate-100 transition shrink-0 cursor-pointer">
                 <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-sm">EFN</span>
@@ -94,21 +102,23 @@
                 </div>
             </button>
 
+            <!-- Pemilih Jenjang Kelas VII / VIII / IX -->
             <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200 shrink-0">
                 <button type="button" id="efn-grade-btn-7" data-grade="7"
                     class="efn-grade-tab px-2.5 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer">Kelas VII</button>
                 <button type="button" id="efn-grade-btn-8" data-grade="8"
-                    class="efn-grade-tab px-2.5 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer bg-indigo-600 text-white">Kelas VIII</button>
+                    class="efn-grade-tab px-2.5 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer">Kelas VIII</button>
                 <button type="button" id="efn-grade-btn-9" data-grade="9"
                     class="efn-grade-tab px-2.5 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer">Kelas IX</button>
             </div>
 
+            <!-- Dropdown Chapter + Tombol Peta & Alat Proyektor dalam satu baris -->
             <div class="flex items-center gap-1.5 shrink-0">
                 <select id="efn-chapter-select" aria-label="Pilih Chapter"
-                    class="px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-950 font-extrabold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[180px] sm:max-w-[235px] cursor-pointer">
-                    <option value="0">Chapter 1: Celebrating Independence Day</option>
+                    class="px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-950 font-extrabold text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[180px] sm:max-w-[225px] cursor-pointer">
                 </select>
 
+                <!-- Tombol Kembali ke Peta & Lencana Pertemuan -->
                 <div id="efn-nav-meeting-controls" class="hidden items-center gap-1.5 shrink-0">
                     <button type="button" id="efn-back-roadmap-btn"
                         class="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs transition shrink-0 cursor-pointer">
@@ -120,6 +130,7 @@
                     </span>
                 </div>
 
+                <!-- Alat Proyektor, Kamus & Ujian CBT -->
                 <button type="button" id="efn-laser-btn"
                     class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition shrink-0 cursor-pointer"
                     title="Penunjuk Laser Proyektor (Tekan L)">
@@ -151,19 +162,25 @@
             </div>
         </div>
 
+        <!-- COMPACT SINGLE-LINE STICKY UNIT TITLE & SLIDE ALLOCATION BAR -->
         <div id="efn-classroom-sticky-bar" class="hidden bg-slate-900 text-white border-t border-slate-800">
             <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
                 <h2 id="efn-sticky-unit-title" class="text-sm sm:text-base font-black text-white tracking-tight truncate">
-                    Unit 1 — Celebrating Independence Day
+                    Unit 1 — Exploring Indonesian Fauna
                 </h2>
                 <div id="efn-sticky-time-slots" class="flex items-center gap-1 overflow-x-auto pb-0.5 lg:pb-0 shrink-0"></div>
             </div>
         </div>
     </header>
 
+    <!-- ===================================================================== -->
+    <!-- MAIN CONTENT CONTAINER                                                -->
+    <!-- ===================================================================== -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-5">
-        <!-- VIEW 1: PETA PERTEMUAN CHAPTER -->
+
+        <!-- VIEW 1: PETA PERTEMUAN CHAPTER (ROADMAP VIEW) -->
         <section id="efn-roadmap-view" class="space-y-5">
+            <!-- Hero Banner Chapter (Ukuran Proporsional) -->
             <div class="relative rounded-3xl overflow-hidden bg-slate-900 text-white shadow-xl border border-slate-800">
                 <div class="grid grid-cols-1 lg:grid-cols-12 items-stretch">
                     <div class="lg:col-span-8 p-5 sm:p-6 flex flex-col justify-between space-y-3.5">
@@ -207,6 +224,7 @@
                 </div>
             </div>
 
+            <!-- Grid Daftar 8 Pertemuan -->
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -221,11 +239,13 @@
             </div>
         </section>
 
-        <!-- VIEW 2: SLIDE PRESENTASI INTERAKTIF KELAS -->
+        <!-- VIEW 2: SLIDE PRESENTASI INTERAKTIF KELAS (CLASSROOM VIEW) -->
         <section id="efn-classroom-view" class="hidden space-y-4">
+            <!-- Kanvas Slide Utama -->
             <div id="efn-stage-container" class="bg-white rounded-3xl border border-slate-200 shadow-lg p-5 sm:p-7 min-h-[calc(100vh-230px)] flex flex-col justify-between presentation-slide-enter">
             </div>
 
+            <!-- Deck Controller Bar -->
             <div class="bg-slate-900 text-white px-4 sm:px-6 py-3 rounded-2xl shadow-lg border border-slate-800 flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2">
                     <button type="button" id="efn-prev-stage-btn"
@@ -241,6 +261,7 @@
                 <div class="flex items-center gap-3">
                     <div id="efn-slide-dots" class="flex items-center gap-1.5"></div>
                     <span id="efn-stage-progress-text" class="text-xs sm:text-sm font-extrabold text-amber-300">Slide 1 / 6</span>
+                    <!-- Mini Timer Slide -->
                     <div class="hidden sm:flex items-center gap-1.5 pl-3 border-l border-slate-700">
                         <span id="efn-class-timer-display" class="font-mono text-xs font-extrabold text-emerald-400 bg-slate-800 px-2.5 py-1 rounded-lg">15:00</span>
                         <button type="button" id="efn-class-timer-btn"
@@ -257,7 +278,7 @@
             </div>
         </section>
 
-        <!-- VIEW 3: PUSAT UJIAN & EVALUASI CBT -->
+        <!-- VIEW 3: PUSAT UJIAN & EVALUASI CBT PER JENJANG -->
         <section id="efn-exam-view" class="hidden space-y-6">
             <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-lg">
                 <div>
@@ -278,7 +299,10 @@
         </section>
     </main>
 
-    <!-- MODALS -->
+    <!-- ===================================================================== -->
+    <!-- MODALS & TOAST                                                        -->
+    <!-- ===================================================================== -->
+    <!-- Modal Penjelasan Istilah Tata Bahasa -->
     <div id="efn-glossary-modal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-indigo-700 text-white flex items-center justify-between">
@@ -309,6 +333,7 @@
         </div>
     </div>
 
+    <!-- Modal Daftar Semua Istilah -->
     <div id="efn-glossary-index-modal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
@@ -322,6 +347,7 @@
         </div>
     </div>
 
+    <!-- Modal Slide Overview -->
     <div id="efn-slide-overview-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
@@ -335,6 +361,7 @@
         </div>
     </div>
 
+    <!-- Modal Pemilih Siswa Acak -->
     <div id="efn-spinner-modal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 bg-emerald-700 text-white flex items-center justify-between">
@@ -362,28 +389,22 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
     <div id="efn-toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 text-xs sm:text-sm font-bold"></div>
 
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT DATA & INTERACTIVE PRESENTATION ENGINE                     -->
+    <!-- ===================================================================== -->
     <script>
-        function efnGetFallbackSvg(label, bg) {
-            const fillBg = bg || "#1e293b";
-            const safeLabel = String(label || "English for Nusantara").replace(/[<>&"]/g, "");
-            const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">' +
-                '<rect width="900" height="520" fill="' + fillBg + '"/>' +
-                '<circle cx="450" cy="210" r="78" fill="#6366f1" opacity="0.28"/>' +
-                '<text x="450" y="224" font-family="sans-serif" font-size="46" text-anchor="middle" fill="#ffffff">📘</text>' +
-                '<text x="450" y="325" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#f8fafc">' + safeLabel + '</text>' +
-                '<text x="450" y="360" font-family="sans-serif" font-size="15" text-anchor="middle" fill="#94a3b8">English for Nusantara — Visual Pembelajaran</text>' +
-                '</svg>';
-            return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-        }
-
-        function efnEscHtml(str) {
-            return String(str || "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;");
+        function efnGetFallbackSvg(label, bg = "#1e293b") {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+                <rect width="900" height="520" fill="${bg}"/>
+                <circle cx="450" cy="210" r="78" fill="#6366f1" opacity="0.28"/>
+                <text x="450" y="224" font-family="sans-serif" font-size="46" text-anchor="middle" fill="#ffffff">📘</text>
+                <text x="450" y="325" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#f8fafc">${label}</text>
+                <text x="450" y="360" font-family="sans-serif" font-size="15" text-anchor="middle" fill="#94a3b8">English for Nusantara — Visual Pembelajaran</text>
+            </svg>`;
+            return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
         }
 
         const efnGlossaryDB = {
@@ -401,7 +422,7 @@
             },
             "Descriptive Text": {
                 desc: "Teks yang menggambarkan ciri khusus seseorang, hewan, makanan, atau tempat secara rinci (Identification + Description).",
-                formula: "Struktur: 1. Identification (Pengenalan) -> 2. Description (Ciri-ciri khusus)",
+                formula: "Struktur: 1. Identification (Pengenalan) → 2. Description (Ciri-ciri khusus)",
                 example: "Pisang Goreng is crispy on the outside and sweet on the inside.",
                 translation: "Pisang goreng renyah di bagian luar dan manis di bagian dalam."
             },
@@ -418,14 +439,14 @@
                 translation: "Kami mengunjungi Taman Nasional Tanjung Puting liburan lalu."
             },
             "Recount Text": {
-                desc: "Teks yang menceritakan kembali pengalaman nyata di masa lampau secara berurutan (Orientation -> Events -> Re-orientation).",
-                formula: "Struktur: Orientation (Kapan/Siapa) -> Series of Events -> Re-orientation (Kesan)",
+                desc: "Teks yang menceritakan kembali pengalaman nyata di masa lampau secara berurutan (Orientation → Events → Re-orientation).",
+                formula: "Struktur: Orientation (Kapan/Siapa) → Series of Events → Re-orientation (Kesan)",
                 example: "Last August, our school held a sack race to celebrate Independence Day.",
                 translation: "Agustus lalu, sekolah kami mengadakan lomba balap karung untuk merayakan Hari Kemerdekaan."
             },
             "Narrative Text": {
                 desc: "Teks cerita imajinatif atau fabel yang memiliki konflik dan penyelesaian untuk menghibur sekaligus memberi pesan moral.",
-                formula: "Orientation -> Complication (Masalah) -> Resolution (Solusi) -> Coda (Pesan Moral)",
+                formula: "Orientation → Complication (Masalah) → Resolution (Solusi) → Coda (Pesan Moral)",
                 example: "The ugly duckling finally realized that he had become a graceful white swan.",
                 translation: "Anak itik buruk rupa itu akhirnya menyadari bahwa ia telah menjadi angsa putih yang anggun."
             },
@@ -437,7 +458,7 @@
             },
             "Report Text": {
                 desc: "Teks faktual yang mendeskripsikan suatu spesies, fenomena alam, atau objek secara umum berdasarkan hasil observasi ilmiah.",
-                formula: "Struktur: 1. General Classification (Klasifikasi Umum) -> 2. Description (Ciri & Habitat)",
+                formula: "Struktur: 1. General Classification (Klasifikasi Umum) → 2. Description (Ciri & Habitat)",
                 example: "Bekantan is a reddish-brown monkey with a long and big nose.",
                 translation: "Bekantan adalah monyet berwarna cokelat kemerahan dengan hidung panjang dan besar."
             },
@@ -455,7 +476,7 @@
             },
             "Procedure Text": {
                 desc: "Teks yang menjelaskan langkah-langkah berurutan untuk membuat sesuatu atau mengoperasikan perangkat digital.",
-                formula: "Goal (Tujuan) -> Materials/Tools (Alat & Bahan) -> Steps (Langkah-langkah)",
+                formula: "Goal (Tujuan) → Materials/Tools (Alat & Bahan) → Steps (Langkah-langkah)",
                 example: "First, cut the used plastic bottle into two equal parts.",
                 translation: "Pertama, potong botol plastik bekas menjadi dua bagian yang sama."
             },
@@ -499,7 +520,7 @@
                                 "Ceritakan hobi favoritmu di akhir perkenalan."
                             ],
                             grammarTitle: "Memperkenalkan Diri dengan To Be (Is / Am / Are)",
-                            grammarTerms: ["To Be (Is/Am/Are)", "Simple Present Tense"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('To Be (Is/Am/Are)')\">To Be (Is/Am/Are)</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Present Tense')\">Simple Present Tense</span>.",
                             formulaPositive: "My name is Galang and I am from Kalimantan.",
                             formulaNegative: "I am not from Java; I live in Borneo.",
                             formulaQuestion: "Where are you from and what is your hobby?",
@@ -544,7 +565,7 @@
                                 "Tambahkan kata kerja bentuk -ing setelah kata like (like cycling, likes reading)."
                             ],
                             grammarTitle: "Menyatakan Hobi (Simple Present Tense)",
-                            grammarTerms: ["Simple Present Tense"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Present Tense')\">Simple Present Tense</span> untuk kebiasaan dan kegemaran.",
                             formulaPositive: "Monita likes reading books and Andre likes cycling.",
                             formulaNegative: "Galang does not like playing video games all day.",
                             formulaQuestion: "Do you like cycling in the morning?",
@@ -599,7 +620,7 @@
                                 "Jelaskan kapan kamu biasanya menyantap hidangan tersebut."
                             ],
                             grammarTitle: "Mendeskripsikan Makanan (Descriptive Text)",
-                            grammarTerms: ["Descriptive Text", "Simple Present Tense"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Descriptive Text')\">Descriptive Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Present Tense')\">Simple Present Tense</span>.",
                             formulaPositive: "Nasi Goreng tastes savory and slightly spicy.",
                             formulaNegative: "Pisang Goreng is not sour; it is sweet and crispy.",
                             formulaQuestion: "What does your favorite Indonesian food taste like?",
@@ -654,7 +675,7 @@
                                 "Jelaskan posisi benda dengan preposisi tempat (next to, on, under)."
                             ],
                             grammarTitle: "Menunjukkan Letak Benda (Prepositions of Place)",
-                            grammarTerms: ["Prepositions of Place", "Descriptive Text"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Prepositions of Place')\">Prepositions of Place</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Descriptive Text')\">Descriptive Text</span>.",
                             formulaPositive: "There is a study desk next to the bedroom window.",
                             formulaNegative: "There are not any messy clothes on the floor.",
                             formulaQuestion: "Where is the study lamp located?",
@@ -709,7 +730,7 @@
                                 "Sebutkan mata pelajaran dengan huruf kapital untuk bahasa (English, Indonesian)."
                             ],
                             grammarTitle: "Menyebutkan Jadwal Pelajaran (On + Day / At + Time)",
-                            grammarTerms: ["Simple Present Tense"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Present Tense')\">Simple Present Tense</span> untuk jadwal rutin mingguan.",
                             formulaPositive: "We have English and Science on Tuesday at eight o'clock.",
                             formulaNegative: "We do not have Physical Education on Friday.",
                             formulaQuestion: "What subjects do you have on Monday?",
@@ -764,7 +785,7 @@
                                 "Gunakan kalimat sopan 'Excuse me, where is the school library?' saat bertanya."
                             ],
                             grammarTitle: "Memberikan Petunjuk Arah di Sekolah (Imperative Verbs)",
-                            grammarTerms: ["Imperative Verbs", "Prepositions of Place"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Imperative Verbs')\">Imperative Verbs</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Prepositions of Place')\">Prepositions of Place</span>.",
                             formulaPositive: "Go straight along this corridor and turn left at the corner.",
                             formulaNegative: "Do not make noise inside the school library.",
                             formulaQuestion: "Excuse me, how do I get to the science laboratory?",
@@ -812,7 +833,7 @@
                             visualImg: "https://commons.wikimedia.org/wiki/Special:FilePath/File:Lomba_balap_karung_anak-anak.jpg?width=960",
                             visualCaption: "Lomba Balap Karung & Panjat Pinang Memeriahkan 17 Agustus",
                             hotspots: [
-                                { x: 35, y: 45, title: "Regular & Irregular Verbs (V2)", text: "Gunakan V2 untuk kejadian lampau: join -> joined, climb -> climbed, win -> won, jump -> jumped." },
+                                { x: 35, y: 45, title: "Regular & Irregular Verbs (V2)", text: "Gunakan V2 untuk kejadian lampau: join → joined, climb → climbed, win → won, jump → jumped." },
                                 { x: 70, y: 48, title: "Time Expressions", text: "Tandai waktu lampau dengan: last August, yesterday, two weeks ago, on August 17th." }
                             ],
                             easySteps: [
@@ -821,7 +842,7 @@
                                 "Akhiri cerita dengan perasaan atau kesanmu (We felt very happy and proud)."
                             ],
                             grammarTitle: "Menceritakan Pengalaman Lampau (Simple Past Tense)",
-                            grammarTerms: ["Simple Past Tense", "Recount Text"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Recount Text')\">Recount Text</span>.",
                             formulaPositive: "Galang joined the sack race and won the first prize.",
                             formulaNegative: "He did not give up when he fell down.",
                             formulaQuestion: "Did your class win the panjat pinang and tug-of-war competitions?",
@@ -857,7 +878,7 @@
                             visualImg: "https://commons.wikimedia.org/wiki/Special:FilePath/File:Tarik_Tambang_Indonesia.jpg?width=960",
                             visualCaption: "Lomba Tarik Tambang & Upacara Bendera 17 Agustus",
                             hotspots: [
-                                { x: 32, y: 44, title: "Orientation -> Events -> Re-orientation", text: "Awali dengan pengenalan waktu & tempat, lanjutkan urutan kejadian, lalu tutup dengan kesan." },
+                                { x: 32, y: 44, title: "Orientation → Events → Re-orientation", text: "Awali dengan pengenalan waktu & tempat, lanjutkan urutan kejadian, lalu tutup dengan kesan." },
                                 { x: 70, y: 46, title: "Time Connectives", text: "Gunakan First, After that, Next, Finally untuk menghubungkan urutan peristiwa." }
                             ],
                             easySteps: [
@@ -866,7 +887,7 @@
                                 "Tulis kesan akhir (Re-orientation) tentang makna Hari Kemerdekaan."
                             ],
                             grammarTitle: "Struktur Teks Recount & Kata Penghubung Waktu",
-                            grammarTerms: ["Recount Text", "Simple Past Tense"],
+                            grammarFocusHtml: "Susun paragraf berurutan menggunakan struktur <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Recount Text')\">Recount Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span>.",
                             formulaPositive: "First, we gathered in the schoolyard. After that, the principal gave a speech.",
                             formulaNegative: "Nobody talked during the flag hoisting.",
                             formulaQuestion: "How did the ceremony end?",
@@ -921,7 +942,7 @@
                                 "Simpulkan pesan moral cerita pada bagian Resolution / Coda."
                             ],
                             grammarTitle: "Memahami Alur Cerita Fabel (Narrative Text)",
-                            grammarTerms: ["Narrative Text", "Simple Past Tense"],
+                            grammarFocusHtml: "Gunakan struktur <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Narrative Text')\">Narrative Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span>.",
                             formulaPositive: "Once upon a time, a gray duckling lived near a quiet pond.",
                             formulaNegative: "The other ducklings did not want to play with him.",
                             formulaQuestion: "What happened to the duckling in spring?",
@@ -966,7 +987,7 @@
                                 "Tuliskan kembali pelajaran tentang kerja sama dan persahabatan."
                             ],
                             grammarTitle: "Kata Kerja Lampau & Dialog dalam Cerita Fabel",
-                            grammarTerms: ["Narrative Text", "Simple Past Tense"],
+                            grammarFocusHtml: "Pelajari <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Narrative Text')\">Narrative Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span>.",
                             formulaPositive: "The elephant walked through the forest to look for friends.",
                             formulaNegative: "The rabbit could not swing on trees like a monkey.",
                             formulaQuestion: "How did the elephant save the forest animals?",
@@ -1021,7 +1042,7 @@
                                 "Buat kalimat singkat, jelas, dan mudah diingat untuk poster peduli lingkungan."
                             ],
                             grammarTitle: "Kalimat Ajakan & Larangan Peduli Lingkungan (Imperatives)",
-                            grammarTerms: ["Imperative Verbs"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Imperative Verbs')\">Imperative Verbs</span> untuk memberikan instruksi hemat air, energi, dan kurangi plastik.",
                             formulaPositive: "Turn off the water tap when brushing your teeth! / Bring a reusable bottle!",
                             formulaNegative: "Don't waste electricity! / Don't use single-use plastic bags!",
                             formulaQuestion: "How can we save water and energy at school?",
@@ -1076,7 +1097,7 @@
                                 "Tutup dengan ajakan 'No Littering' agar sungai tetap bersih dan bebas banjir."
                             ],
                             grammarTitle: "Melaporkan Aksi Bersih Sungai (Simple Past Tense)",
-                            grammarTerms: ["Recount Text", "Simple Past Tense"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Recount Text')\">Recount Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span>.",
                             formulaPositive: "Last Sunday, students and villagers cleaned the river from plastic trash.",
                             formulaNegative: "They did not leave any garbage along the riverbank.",
                             formulaQuestion: "What did the volunteers remove from the river?",
@@ -1131,7 +1152,7 @@
                                 "Saling berikan apresiasi tulus kepada teman sekelas tanpa membandingkan fisik."
                             ],
                             grammarTitle: "Menggambarkan Kekuatan Diri (Simple Present & Adjectives)",
-                            grammarTerms: ["To Be (Is/Am/Are)", "Descriptive Text"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('To Be (Is/Am/Are)')\">To Be (Is/Am/Are)</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Descriptive Text')\">Descriptive Text</span> untuk membangun kepercayaan diri.",
                             formulaPositive: "I am confident, creative, and proud of my own talents.",
                             formulaNegative: "We should not compare ourselves negatively with others.",
                             formulaQuestion: "What makes you feel proud of yourself?",
@@ -1188,7 +1209,7 @@
                                 "Gunakan Noun Groups agar deskripsi padat, jelas, dan ilmiah."
                             ],
                             grammarTitle: "Menyusun Teks Laporan Faktual (Report Text & Noun Groups)",
-                            grammarTerms: ["Report Text", "Noun Groups"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Report Text')\">Report Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Noun Groups')\">Noun Groups</span>.",
                             formulaPositive: "Bekantan is a reddish-brown monkey that lives in mangrove forests.",
                             formulaNegative: "Orangutans do not live in the wild outside Borneo and Sumatra.",
                             formulaQuestion: "Where do Bekantans live and what do they eat?",
@@ -1233,7 +1254,7 @@
                                 "Ubah kata kerja utama menjadi bentuk ketiga / Past Participle (found, protected, kept)."
                             ],
                             grammarTitle: "Kalimat Pasif dalam Teks Ilmiah (Passive Voice)",
-                            grammarTerms: ["Passive Voice", "Report Text"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Passive Voice')\">Passive Voice</span> dalam <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Report Text')\">Report Text</span>.",
                             formulaPositive: "Komodo dragons are protected in Komodo National Park.",
                             formulaNegative: "Wild Bali starlings are not allowed to be hunted.",
                             formulaQuestion: "Where are Komodo dragons found in Indonesia?",
@@ -1288,7 +1309,7 @@
                                 "Tutup dengan kesan perjalanan pada bagian Re-orientation."
                             ],
                             grammarTitle: "Menceritakan Perjalanan Wisata (Recount Text)",
-                            grammarTerms: ["Recount Text", "Simple Past Tense"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Recount Text')\">Recount Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span>.",
                             formulaPositive: "We climbed the stone stairs and admired the ancient reliefs.",
                             formulaNegative: "We did not forget to take photos near the main stupa.",
                             formulaQuestion: "What did you learn during the Borobudur study tour?",
@@ -1343,7 +1364,7 @@
                                 "Selesaikan konflik dengan keberanian dan kecerdikan tokoh (Resolution)."
                             ],
                             grammarTitle: "Menyusun Cerita Fantasi (Narrative Text)",
-                            grammarTerms: ["Narrative Text", "Simple Past Tense"],
+                            grammarFocusHtml: "Gunakan struktur <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Narrative Text')\">Narrative Text</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Simple Past Tense')\">Simple Past Tense</span>.",
                             formulaPositive: "Andre found an old brass compass inside his grandfather's attic.",
                             formulaNegative: "The glowing needle did not point to the north.",
                             formulaQuestion: "Where did the mysterious compass take Andre?",
@@ -1389,7 +1410,7 @@
                             visualImg: "https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=900&q=80",
                             visualCaption: "Tas Jinjing Biru dari Celana Jeans Bekas (Upcycled Denim Bag)",
                             hotspots: [
-                                { x: 35, y: 45, title: "OSASCOMP Order", text: "Urutan kata sifat: Opinion -> Size -> Age -> Shape -> Color -> Origin -> Material + Noun." },
+                                { x: 35, y: 45, title: "OSASCOMP Order", text: "Urutan kata sifat: Opinion → Size → Age → Shape → Color → Origin → Material + Noun." },
                                 { x: 70, y: 48, title: "Procedure Steps", text: "Gunakan Imperative Verbs (Cut, Sew, Glue, Decorate) dan penghubung (First, Next, Finally)." }
                             ],
                             easySteps: [
@@ -1398,7 +1419,7 @@
                                 "Tulis langkah-langkah secara berurutan menggunakan kata kerja perintah."
                             ],
                             grammarTitle: "Urutan Kata Sifat (OSASCOMP) & Teks Prosedur",
-                            grammarTerms: ["Order of Adjectives", "Procedure Text"],
+                            grammarFocusHtml: "Terapkan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Order of Adjectives')\">Order of Adjectives</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Procedure Text')\">Procedure Text</span>.",
                             formulaPositive: "Look at this lovely medium blue denim tote bag!",
                             formulaNegative: "Do not throw away your old jeans; upcycle them!",
                             formulaQuestion: "How much does this handmade denim bag cost?",
@@ -1422,7 +1443,7 @@
                                     question: "Urutan kata sifat (OSASCOMP) yang benar adalah...",
                                     options: ["A plastic small round pot", "A small round plastic pot", "A round plastic small pot", "A plastic round small pot"],
                                     answer: 1,
-                                    explanation: "Urutan yang benar: Size (small) -> Shape (round) -> Material (plastic) + Noun (pot)."
+                                    explanation: "Urutan yang benar: Size (small) → Shape (round) → Material (plastic) + Noun (pot)."
                                 }
                             ],
                             reflection: "Barang bekas apa di rumahmu yang bisa kamu ubah menjadi produk berguna?"
@@ -1453,7 +1474,7 @@
                                 "Gunakan 'should' untuk saran bijak dalam memeriksa kebenaran berita."
                             ],
                             grammarTitle: "Saran & Aturan Keamanan Digital (Modals Should/Must)",
-                            grammarTerms: ["Modals (Should/Must)", "Procedure Text"],
+                            grammarFocusHtml: "Gunakan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Modals (Should/Must)')\">Modals (Should/Must)</span> dan <span class='grammar-term' onclick=\"efnOpenGlossaryModal('Procedure Text')\">Procedure Text</span>.",
                             formulaPositive: "You should check the author and date before sharing online news.",
                             formulaNegative: "You mustn't share your password or OTP code with anyone.",
                             formulaQuestion: "What should we do when we receive suspicious links?",
@@ -1487,6 +1508,9 @@
             ]
         };
 
+        // =========================================================================
+        // EKSPANSI OTOMATIS SETIAP CHAPTER MENJADI 8 PERTEMUAN TERSTRUKTUR PENUH
+        // =========================================================================
         const efnStageTemplates = [
             { slot: "15 Menit", label: "Slide 1 • Konteks Visual", goal: "Mengamati foto nyata & mengeksplorasi hotspot kosakata kunci." },
             { slot: "20 Menit", label: "Slide 2 • Konsep & Rumus", goal: "Memahami 3 langkah mudah & pola tata bahasa inti." },
@@ -1542,8 +1566,8 @@
         ];
 
         (function expandAllChaptersToEightMeetings() {
-            Object.keys(efnCurriculumByGrade).forEach(function (gradeKey) {
-                efnCurriculumByGrade[gradeKey].forEach(function (chapter) {
+            Object.keys(efnCurriculumByGrade).forEach((gradeKey) => {
+                efnCurriculumByGrade[gradeKey].forEach((chapter) => {
                     const baseCount = chapter.meetings.length;
                     let idx = 0;
                     while (chapter.meetings.length < 8) {
@@ -1552,40 +1576,27 @@
                         const bp = efnExtensionBlueprints[(meetingNum - 3) % efnExtensionBlueprints.length];
 
                         chapter.meetings.push({
-                            unitTitle: "Unit " + meetingNum + " — " + bp.badge.replace(/^Pertemuan \d+ • /, "") + " (" + chapter.title.replace(/^Chapter \d+:\s*/, "") + ")",
+                            ...sourceMeeting,
+                            unitTitle: `Unit ${meetingNum} — ${bp.badge.replace(/^Pertemuan \d+ • /, "")} (${chapter.title.replace(/^Chapter \d+:\s*/, "")})`,
                             skillFocus: bp.skill,
-                            summary: bp.focusIntro + " Topik acuan: " + sourceMeeting.summary,
+                            summary: `${bp.focusIntro} Topik acuan: ${sourceMeeting.summary}`,
                             visualImg: meetingNum % 2 === 1 ? sourceMeeting.visualImg : bp.img,
                             visualCaption: meetingNum % 2 === 1 ? sourceMeeting.visualCaption : bp.caption,
                             hotspots: [
                                 {
                                     x: 34,
                                     y: 44,
-                                    title: "Fokus Pertemuan " + meetingNum,
+                                    title: `Fokus Pertemuan ${meetingNum}`,
                                     text: bp.focusIntro
                                 },
                                 {
                                     x: 68,
                                     y: 50,
                                     title: "Target Bahasa Utama",
-                                    text: 'Pola kalimat kunci: "' + sourceMeeting.formulaPositive + '"'
+                                    text: `Pola kalimat kunci: "${sourceMeeting.formulaPositive}"`
                                 }
                             ],
-                            easySteps: sourceMeeting.easySteps,
-                            grammarTitle: sourceMeeting.grammarTitle,
-                            grammarTerms: sourceMeeting.grammarTerms,
-                            formulaPositive: sourceMeeting.formulaPositive,
-                            formulaNegative: sourceMeeting.formulaNegative,
-                            formulaQuestion: sourceMeeting.formulaQuestion,
-                            commonMistake: sourceMeeting.commonMistake,
-                            correctForm: sourceMeeting.correctForm,
-                            flashcards: sourceMeeting.flashcards,
-                            readingTitle: sourceMeeting.readingTitle,
-                            readingText: sourceMeeting.readingText,
-                            sentences: sourceMeeting.sentences,
-                            builderWords: sourceMeeting.builderWords,
-                            quizzes: sourceMeeting.quizzes,
-                            reflection: "Apa keterampilan baru yang paling kamu kuasai pada Pertemuan " + meetingNum + " (" + bp.skill + ")?"
+                            reflection: `Apa keterampilan baru yang paling kamu kuasai pada Pertemuan ${meetingNum} (${bp.skill})?`
                         });
                         idx++;
                     }
@@ -1593,6 +1604,9 @@
             });
         })();
 
+        // =========================================================================
+        // DATABASE PAKET UJIAN CBT PER JENJANG (KELAS VII, VIII & IX)
+        // =========================================================================
         const efnExamsByGrade = {
             7: [
                 {
@@ -1760,7 +1774,7 @@
                             q: "Monita made a ___ tote bag from old trousers.",
                             options: ["lovely blue denim", "denim blue lovely", "blue denim lovely", "lovely denim blue"],
                             answer: 0,
-                            explanation: "Urutan OSASCOMP: Opinion (lovely) -> Color (blue) -> Material (denim)."
+                            explanation: "Urutan OSASCOMP: Opinion (lovely) → Color (blue) → Material (denim)."
                         },
                         {
                             q: "You ___ share your personal password or OTP code with strangers online.",
@@ -1773,6 +1787,9 @@
             ]
         };
 
+        // =========================================================================
+        // STATE APLIKASI & ENGINE NAVIGASI SLIDE PRESENTASI
+        // =========================================================================
         const efnState = {
             grade: 8,
             chapterIdx: 0,
@@ -1796,25 +1813,21 @@
             toast.textContent = msg;
             toast.classList.remove("hidden");
             clearTimeout(toast._hideTimeout);
-            toast._hideTimeout = setTimeout(function () {
+            toast._hideTimeout = setTimeout(() => {
                 toast.classList.add("hidden");
             }, 2600);
         }
 
         function efnSpeak(text) {
-            try {
-                if (!("speechSynthesis" in window)) {
-                    efnShowToast("Browser tidak mendukung audio pelafalan.");
-                    return;
-                }
-                window.speechSynthesis.cancel();
-                const utter = new SpeechSynthesisUtterance(text);
-                utter.lang = "en-US";
-                utter.rate = 0.94;
-                window.speechSynthesis.speak(utter);
-            } catch (err) {
-                console.warn("Speech synthesis unavailable:", err);
+            if (!("speechSynthesis" in window)) {
+                efnShowToast("Browser tidak mendukung audio pelafalan.");
+                return;
             }
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = "en-US";
+            utter.rate = 0.94;
+            window.speechSynthesis.speak(utter);
         }
 
         function efnGetCurrentChapter() {
@@ -1836,8 +1849,8 @@
             efnState.examAnswers = {};
             efnState.examSubmitted = false;
 
-            [7, 8, 9].forEach(function (g) {
-                const btn = document.getElementById("efn-grade-btn-" + g);
+            [7, 8, 9].forEach((g) => {
+                const btn = document.getElementById(`efn-grade-btn-${g}`);
                 if (!btn) return;
                 if (g === efnState.grade) {
                     btn.className = "efn-grade-tab px-2.5 py-1 rounded-lg text-xs font-extrabold transition cursor-pointer bg-indigo-600 text-white shadow-sm";
@@ -1854,9 +1867,9 @@
             const select = document.getElementById("efn-chapter-select");
             if (!select) return;
             const chapters = efnCurriculumByGrade[efnState.grade] || [];
-            select.innerHTML = chapters.map(function (ch, idx) {
-                return '<option value="' + idx + '"' + (idx === efnState.chapterIdx ? " selected" : "") + '>' + efnEscHtml(ch.title) + '</option>';
-            }).join("");
+            select.innerHTML = chapters.map((ch, idx) =>
+                `<option value="${idx}" ${idx === efnState.chapterIdx ? "selected" : ""}>${ch.title}</option>`
+            ).join("");
         }
 
         function efnSelectChapter(idx) {
@@ -1866,6 +1879,9 @@
             efnBackToRoadmap();
         }
 
+        // =========================================================================
+        // RENDER VIEW 1: PETA PERTEMUAN (ROADMAP)
+        // =========================================================================
         function efnBackToRoadmap() {
             document.getElementById("efn-roadmap-view").classList.remove("hidden");
             document.getElementById("efn-classroom-view").classList.add("hidden");
@@ -1885,67 +1901,55 @@
             const chapter = efnGetCurrentChapter();
             const gradeRoman = efnState.grade === 7 ? "VII" : efnState.grade === 8 ? "VIII" : "IX";
 
-            document.getElementById("efn-hero-grade-badge").textContent = "Kelas " + gradeRoman + " • Fase D";
+            document.getElementById("efn-hero-grade-badge").textContent = `Kelas ${gradeRoman} • Fase D`;
             document.getElementById("efn-hero-theme-badge").textContent = chapter.theme;
             document.getElementById("efn-hero-title").textContent = chapter.title;
             document.getElementById("efn-hero-desc").textContent = chapter.desc;
             document.getElementById("efn-hero-caption").textContent = chapter.heroCaption;
 
             const heroImg = document.getElementById("efn-hero-img");
-            heroImg.onerror = function () {
-                this.onerror = null;
-                this.src = efnGetFallbackSvg(chapter.title);
-            };
+            heroImg.onerror = () => { heroImg.src = efnGetFallbackSvg(chapter.title); };
             heroImg.src = chapter.heroImg;
 
-            document.getElementById("efn-meeting-count-badge").textContent = chapter.meetings.length + " Pertemuan";
+            document.getElementById("efn-meeting-count-badge").textContent = `${chapter.meetings.length} Pertemuan`;
 
             const grid = document.getElementById("efn-meetings-grid");
-            grid.innerHTML = chapter.meetings.map(function (m, idx) {
-                return '<article data-start-meeting="' + idx + '" ' +
-                    'class="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-indigo-300 transition flex flex-col justify-between cursor-pointer">' +
-                    '<div>' +
-                        '<div class="relative h-40 bg-slate-800 overflow-hidden">' +
-                            '<img src="' + efnEscHtml(m.visualImg) + '" alt="' + efnEscHtml(m.unitTitle) + '" ' +
-                                'data-fallback-label="Pertemuan ' + (idx + 1) + '" ' +
-                                'class="efn-safe-img w-full h-full object-cover group-hover:scale-105 transition duration-500" />' +
-                            '<div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent"></div>' +
-                            '<span class="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-indigo-600 text-white font-extrabold text-[11px] shadow">' +
-                                'Pertemuan ' + (idx + 1) + ' / ' + chapter.meetings.length +
-                            '</span>' +
-                            '<span class="absolute bottom-2.5 left-3 right-3 text-[11px] font-bold text-slate-100 truncate">' +
-                                efnEscHtml(m.skillFocus) +
-                            '</span>' +
-                        '</div>' +
-                        '<div class="p-4 space-y-2">' +
-                            '<h3 class="font-black text-slate-900 text-sm sm:text-base leading-snug group-hover:text-indigo-700 transition">' +
-                                efnEscHtml(m.unitTitle) +
-                            '</h3>' +
-                            '<p class="text-xs text-slate-600 leading-relaxed line-clamp-3">' +
-                                efnEscHtml(m.summary) +
-                            '</p>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="px-4 pb-4 pt-1 flex items-center justify-between text-xs font-extrabold text-indigo-600">' +
-                        '<span>Buka 6 Slide Presentasi</span>' +
-                        '<span class="w-7 h-7 rounded-full bg-indigo-50 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition">→</span>' +
-                    '</div>' +
-                '</article>';
-            }).join("");
-
-            efnAttachImageFallbacks(grid);
+            grid.innerHTML = chapter.meetings.map((m, idx) => `
+                <article onclick="efnStartMeeting(${idx})"
+                    class="group bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-indigo-300 transition flex flex-col justify-between cursor-pointer">
+                    <div>
+                        <div class="relative h-40 bg-slate-800 overflow-hidden">
+                            <img src="${m.visualImg}" alt="${m.unitTitle}"
+                                onerror="this.src='${efnGetFallbackSvg(`Pertemuan ${idx + 1}`)}'"
+                                class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-transparent to-transparent"></div>
+                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-indigo-600 text-white font-extrabold text-[11px] shadow">
+                                Pertemuan ${idx + 1} / ${chapter.meetings.length}
+                            </span>
+                            <span class="absolute bottom-2.5 left-3 right-3 text-[11px] font-bold text-slate-100 truncate">
+                                ${m.skillFocus}
+                            </span>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <h3 class="font-black text-slate-900 text-sm sm:text-base leading-snug group-hover:text-indigo-700 transition">
+                                ${m.unitTitle}
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed line-clamp-3">
+                                ${m.summary}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="px-4 pb-4 pt-1 flex items-center justify-between text-xs font-extrabold text-indigo-600">
+                        <span>Buka 6 Slide Presentasi</span>
+                        <span class="w-7 h-7 rounded-full bg-indigo-50 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center transition">→</span>
+                    </div>
+                </article>
+            `).join("");
         }
 
-        function efnAttachImageFallbacks(rootEl) {
-            if (!rootEl) return;
-            rootEl.querySelectorAll(".efn-safe-img").forEach(function (img) {
-                img.onerror = function () {
-                    this.onerror = null;
-                    this.src = efnGetFallbackSvg(this.getAttribute("data-fallback-label") || "Visual Materi");
-                };
-            });
-        }
-
+        // =========================================================================
+        // RENDER VIEW 2: SLIDE PRESENTASI INTERAKTIF KELAS (6 SLIDE PER PERTEMUAN)
+        // =========================================================================
         function efnStartMeeting(meetingIdx) {
             efnState.meetingIdx = Number(meetingIdx);
             efnState.stageIdx = 0;
@@ -2002,32 +2006,36 @@
             const stage = efnStageTemplates[efnState.stageIdx];
 
             document.getElementById("efn-nav-meeting-badge").textContent =
-                "Ch " + (efnState.chapterIdx + 1) + " • Pertemuan " + (efnState.meetingIdx + 1) + "/" + chapter.meetings.length;
+                `Ch ${efnState.chapterIdx + 1} • Pertemuan ${efnState.meetingIdx + 1}/${chapter.meetings.length}`;
             document.getElementById("efn-sticky-unit-title").textContent = meeting.unitTitle;
 
             const slotsEl = document.getElementById("efn-sticky-time-slots");
-            slotsEl.innerHTML = efnStageTemplates.map(function (st, idx) {
+            slotsEl.innerHTML = efnStageTemplates.map((st, idx) => {
                 const active = idx === efnState.stageIdx;
-                return '<button type="button" data-go-stage="' + idx + '" ' +
-                    'class="px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition cursor-pointer whitespace-nowrap ' +
-                    (active ? "bg-amber-400 text-slate-950 shadow-sm" : "bg-slate-800 text-slate-300 hover:bg-slate-700") + '">' +
-                    st.slot + ' • S' + (idx + 1) +
-                '</button>';
+                return `<button type="button" onclick="efnGoToStage(${idx})"
+                    class="px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition cursor-pointer whitespace-nowrap ${
+                        active
+                            ? "bg-amber-400 text-slate-950 shadow-sm"
+                            : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    }">
+                    ${st.slot} • S${idx + 1}
+                </button>`;
             }).join("");
 
             const dotsEl = document.getElementById("efn-slide-dots");
-            dotsEl.innerHTML = efnStageTemplates.map(function (_, idx) {
-                return '<button type="button" data-go-stage="' + idx + '" ' +
-                    'aria-label="Slide ' + (idx + 1) + '" ' +
-                    'class="h-2.5 rounded-full transition-all cursor-pointer ' +
-                    (idx === efnState.stageIdx ? "w-7 bg-amber-400" : "w-2.5 bg-slate-600 hover:bg-slate-400") + '"></button>';
-            }).join("");
-            document.getElementById("efn-stage-progress-text").textContent = "Slide " + (efnState.stageIdx + 1) + " / " + efnStageTemplates.length;
+            dotsEl.innerHTML = efnStageTemplates.map((_, idx) => `
+                <button type="button" onclick="efnGoToStage(${idx})"
+                    aria-label="Slide ${idx + 1}"
+                    class="h-2.5 rounded-full transition-all cursor-pointer ${
+                        idx === efnState.stageIdx ? "w-7 bg-amber-400" : "w-2.5 bg-slate-600 hover:bg-slate-400"
+                    }"></button>
+            `).join("");
+            document.getElementById("efn-stage-progress-text").textContent = `Slide ${efnState.stageIdx + 1} / ${efnStageTemplates.length}`;
 
             const nextBtn = document.getElementById("efn-next-stage-btn");
             if (efnState.stageIdx === efnStageTemplates.length - 1) {
                 nextBtn.textContent = efnState.meetingIdx < chapter.meetings.length - 1
-                    ? "Lanjut Pertemuan " + (efnState.meetingIdx + 2) + " →"
+                    ? `Lanjut Pertemuan ${efnState.meetingIdx + 2} →`
                     : "Selesai & Kembali ke Peta ✓";
             } else {
                 nextBtn.textContent = "Slide Berikutnya →";
@@ -2038,14 +2046,21 @@
             void container.offsetWidth;
             container.classList.add("presentation-slide-enter");
 
-            const slideHeaderHtml =
-                '<div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">' +
-                    '<div class="flex items-center gap-2.5">' +
-                        '<span class="px-3 py-1 rounded-xl bg-indigo-600 text-white font-black text-xs">' + efnEscHtml(stage.label) + '</span>' +
-                        '<span class="px-3 py-1 rounded-xl bg-amber-100 text-amber-900 font-extrabold text-xs">⏱️ Alokasi: ' + efnEscHtml(stage.slot) + '</span>' +
-                    '</div>' +
-                    '<p class="text-xs sm:text-sm font-semibold text-slate-500">🎯 ' + efnEscHtml(stage.goal) + '</p>' +
-                '</div>';
+            const slideHeaderHtml = `
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="px-3 py-1 rounded-xl bg-indigo-600 text-white font-black text-xs">
+                            ${stage.label}
+                        </span>
+                        <span class="px-3 py-1 rounded-xl bg-amber-100 text-amber-900 font-extrabold text-xs">
+                            ⏱️ Alokasi: ${stage.slot}
+                        </span>
+                    </div>
+                    <p class="text-xs sm:text-sm font-semibold text-slate-500">
+                        🎯 ${stage.goal}
+                    </p>
+                </div>
+            `;
 
             let slideBodyHtml = "";
             if (efnState.stageIdx === 0) {
@@ -2062,8 +2077,7 @@
                 slideBodyHtml = efnBuildSlide6Summary(meeting, chapter);
             }
 
-            container.innerHTML = '<div>' + slideHeaderHtml + slideBodyHtml + '</div>';
-            efnAttachImageFallbacks(container);
+            container.innerHTML = `<div>${slideHeaderHtml}${slideBodyHtml}</div>`;
         }
 
         function efnBuildSlide1Visual(meeting) {
@@ -2073,333 +2087,385 @@
                 text: meeting.summary
             };
 
-            const pinsHtml = hotspots.map(function (hs, idx) {
+            const pinsHtml = hotspots.map((hs, idx) => {
                 const isSelected = idx === efnState.activeHotspotIdx;
-                return '<button type="button" data-select-hotspot="' + idx + '" ' +
-                    'style="left: ' + hs.x + '%; top: ' + hs.y + '%;" ' +
-                    'class="absolute -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full font-black text-sm flex items-center justify-center shadow-lg border-2 transition cursor-pointer ' +
-                    (isSelected ? "bg-amber-400 text-slate-950 border-white scale-110 ring-4 ring-amber-400/40" : "bg-indigo-600 text-white border-white hover:scale-105") + '">' +
-                    (idx + 1) +
-                '</button>';
+                return `<button type="button" onclick="efnSelectHotspot(${idx})"
+                    style="left: ${hs.x}%; top: ${hs.y}%;"
+                    class="absolute -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full font-black text-sm flex items-center justify-center shadow-lg border-2 transition cursor-pointer ${
+                        isSelected
+                            ? "bg-amber-400 text-slate-950 border-white scale-110 ring-4 ring-amber-400/40"
+                            : "bg-indigo-600 text-white border-white hover:scale-105"
+                    }">
+                    ${idx + 1}
+                </button>`;
             }).join("");
 
-            return '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">' +
-                '<div class="lg:col-span-6 relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 shadow-md h-60 sm:h-72 lg:h-80">' +
-                    '<img src="' + efnEscHtml(meeting.visualImg) + '" alt="' + efnEscHtml(meeting.visualCaption) + '" ' +
-                        'data-fallback-label="' + efnEscHtml(meeting.unitTitle) + '" ' +
-                        'class="efn-safe-img w-full h-full object-cover" />' +
-                    '<div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>' +
-                    pinsHtml +
-                    '<div class="absolute bottom-3 left-3 right-3 px-3 py-1.5 rounded-xl bg-slate-950/80 text-white text-xs font-semibold backdrop-blur-sm">' +
-                        '📷 ' + efnEscHtml(meeting.visualCaption) +
-                    '</div>' +
-                '</div>' +
-                '<div class="lg:col-span-6 space-y-4">' +
-                    '<div class="p-4 sm:p-5 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2">' +
-                        '<div class="flex items-center justify-between">' +
-                            '<span class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-extrabold">Hotspot #' + (efnState.activeHotspotIdx + 1) + '</span>' +
-                            '<button type="button" data-speak="' + efnEscHtml(activeSpot.text) + '" ' +
-                                'class="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-extrabold cursor-pointer">' +
-                                '🔊 Dengarkan Penjelasan' +
-                            '</button>' +
-                        '</div>' +
-                        '<h3 class="text-xl font-black text-slate-900">' + efnEscHtml(activeSpot.title) + '</h3>' +
-                        '<p class="text-sm sm:text-base text-slate-700 leading-relaxed">' + efnEscHtml(activeSpot.text) + '</p>' +
-                    '</div>' +
-                    '<div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">' +
-                        '<div class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-1">🎯 Ringkasan Materi Pertemuan</div>' +
-                        '<p class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">' + efnEscHtml(meeting.summary) + '</p>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                    <div class="lg:col-span-6 relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-200 shadow-md h-60 sm:h-72 lg:h-80">
+                        <img src="${meeting.visualImg}" alt="${meeting.visualCaption}"
+                            onerror="this.src='${efnGetFallbackSvg(meeting.unitTitle)}'"
+                            class="w-full h-full object-cover" />
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+                        ${pinsHtml}
+                        <div class="absolute bottom-3 left-3 right-3 px-3 py-1.5 rounded-xl bg-slate-950/80 text-white text-xs font-semibold backdrop-blur-sm">
+                            📷 ${meeting.visualCaption}
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="p-4 sm:p-5 rounded-2xl bg-indigo-50 border border-indigo-200 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-xs font-extrabold">
+                                    Hotspot #${efnState.activeHotspotIdx + 1}
+                                </span>
+                                <button type="button" onclick="efnSpeak(\`${activeSpot.text.replace(/"/g, "'")}\`)"
+                                    class="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-extrabold cursor-pointer">
+                                    🔊 Dengarkan Penjelasan
+                                </button>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-900">${activeSpot.title}</h3>
+                            <p class="text-sm sm:text-base text-slate-700 leading-relaxed">${activeSpot.text}</p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="text-xs font-extrabold uppercase tracking-wider text-slate-500 mb-1">🎯 Ringkasan Materi Pertemuan</div>
+                            <p class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">${meeting.summary}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function efnSelectHotspot(idx) {
+            efnState.activeHotspotIdx = idx;
+            efnRenderClassroom();
         }
 
         function efnBuildSlide2Concept(meeting) {
-            const stepsHtml = meeting.easySteps.map(function (step, i) {
-                return '<div class="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">' +
-                    '<span class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">' + (i + 1) + '</span>' +
-                    '<p class="text-sm font-semibold text-slate-800 leading-relaxed">' + efnEscHtml(step) + '</p>' +
-                '</div>';
-            }).join("");
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-6 space-y-4">
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">${meeting.grammarTitle}</h3>
+                        <p class="text-sm sm:text-base text-slate-700 leading-relaxed bg-indigo-50/70 p-4 rounded-2xl border border-indigo-100">
+                            ${meeting.grammarFocusHtml}
+                            <span class="block text-xs text-indigo-700 mt-1.5 font-semibold">💡 Klik istilah bergaris bawah untuk membuka kamus penjelasannya.</span>
+                        </p>
 
-            const termBadgesHtml = (meeting.grammarTerms || ["Simple Present Tense"]).map(function (term) {
-                return '<button type="button" data-glossary="' + efnEscHtml(term) + '" ' +
-                    'class="grammar-term inline-block mr-2 mb-1 bg-white px-2.5 py-1 rounded-lg border border-indigo-200 text-xs sm:text-sm">' +
-                    efnEscHtml(term) +
-                '</button>';
-            }).join("");
+                        <div class="space-y-2.5">
+                            <div class="text-xs font-extrabold uppercase tracking-wider text-slate-500">3 Langkah Mudah Memahami Materi</div>
+                            ${meeting.easySteps.map((step, i) => `
+                                <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                                    <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5">${i + 1}</span>
+                                    <p class="text-sm font-semibold text-slate-800 leading-relaxed">${step}</p>
+                                </div>
+                            `).join("")}
+                        </div>
+                    </div>
 
-            const firstTermKey = (meeting.grammarTerms && meeting.grammarTerms[0]) || "Simple Present Tense";
-            const quickTermInfo = efnGlossaryDB[firstTermKey] || efnGlossaryDB["Simple Present Tense"];
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="p-5 rounded-2xl bg-slate-900 text-white space-y-3 shadow-md">
+                            <div class="text-xs font-extrabold uppercase tracking-wider text-amber-300">📐 Pola Kalimat Utama</div>
+                            <div class="p-3 rounded-xl bg-emerald-500/15 border border-emerald-400/30">
+                                <span class="text-xs font-black text-emerald-300">(+) Positif:</span>
+                                <p class="text-sm sm:text-base font-bold text-white mt-0.5">${meeting.formulaPositive}</p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-rose-500/15 border border-rose-400/30">
+                                <span class="text-xs font-black text-rose-300">(−) Negatif:</span>
+                                <p class="text-sm sm:text-base font-bold text-white mt-0.5">${meeting.formulaNegative}</p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-sky-500/15 border border-sky-400/30">
+                                <span class="text-xs font-black text-sky-300">(?) Pertanyaan:</span>
+                                <p class="text-sm sm:text-base font-bold text-white mt-0.5">${meeting.formulaQuestion}</p>
+                            </div>
+                        </div>
 
-            return '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">' +
-                '<div class="lg:col-span-6 space-y-4">' +
-                    '<h3 class="text-xl sm:text-2xl font-black text-slate-900">' + efnEscHtml(meeting.grammarTitle) + '</h3>' +
-                    '<div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-1.5">' +
-                        '<div class="text-xs font-black uppercase tracking-wider text-amber-900">⚡ Inti Materi Kilat (Mudah Dipahami)</div>' +
-                        '<p class="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed">' + efnEscHtml(quickTermInfo.desc) + '</p>' +
-                        '<div class="text-xs font-mono font-bold text-indigo-900 bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200 mt-1">' +
-                            efnEscHtml(quickTermInfo.formula) +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="text-sm sm:text-base text-slate-700 leading-relaxed bg-indigo-50/70 p-3.5 rounded-2xl border border-indigo-100">' +
-                        '<div class="mb-1">Kamus Istilah Unit: ' + termBadgesHtml + '</div>' +
-                        '<span class="block text-xs text-indigo-700 font-semibold">💡 Klik istilah di atas untuk melihat contoh &amp; terjemahannya.</span>' +
-                    '</div>' +
-                    '<div class="space-y-2.5">' +
-                        '<div class="text-xs font-extrabold uppercase tracking-wider text-slate-500">3 Langkah Mudah Memahami Materi</div>' +
-                        stepsHtml +
-                    '</div>' +
-                '</div>' +
-                '<div class="lg:col-span-6 space-y-4">' +
-                    '<div class="p-5 rounded-2xl bg-slate-900 text-white space-y-3 shadow-md">' +
-                        '<div class="text-xs font-extrabold uppercase tracking-wider text-amber-300">📐 Pola Kalimat Utama</div>' +
-                        '<div class="p-3 rounded-xl bg-emerald-500/15 border border-emerald-400/30">' +
-                            '<span class="text-xs font-black text-emerald-300">(+) Positif:</span>' +
-                            '<p class="text-sm sm:text-base font-bold text-white mt-0.5">' + efnEscHtml(meeting.formulaPositive) + '</p>' +
-                        '</div>' +
-                        '<div class="p-3 rounded-xl bg-rose-500/15 border border-rose-400/30">' +
-                            '<span class="text-xs font-black text-rose-300">(−) Negatif:</span>' +
-                            '<p class="text-sm sm:text-base font-bold text-white mt-0.5">' + efnEscHtml(meeting.formulaNegative) + '</p>' +
-                        '</div>' +
-                        '<div class="p-3 rounded-xl bg-sky-500/15 border border-sky-400/30">' +
-                            '<span class="text-xs font-black text-sky-300">(?) Pertanyaan:</span>' +
-                            '<p class="text-sm sm:text-base font-bold text-white mt-0.5">' + efnEscHtml(meeting.formulaQuestion) + '</p>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
-                        '<div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">' +
-                            '<div class="text-xs font-extrabold text-rose-700 uppercase">❌ Hindari Kesalahan Ini</div>' +
-                            '<p class="text-sm font-semibold text-rose-950 mt-1 line-through">' + efnEscHtml(meeting.commonMistake) + '</p>' +
-                        '</div>' +
-                        '<div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">' +
-                            '<div class="text-xs font-extrabold text-emerald-700 uppercase">✅ Penulisan yang Tepat</div>' +
-                            '<p class="text-sm font-bold text-emerald-950 mt-1">' + efnEscHtml(meeting.correctForm) + '</p>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200">
+                                <div class="text-xs font-extrabold text-rose-700 uppercase">❌ Hindari Kesalahan Ini</div>
+                                <p class="text-sm font-semibold text-rose-950 mt-1 line-through">${meeting.commonMistake}</p>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                <div class="text-xs font-extrabold text-emerald-700 uppercase">✅ Penulisan yang Tepat</div>
+                                <p class="text-sm font-bold text-emerald-950 mt-1">${meeting.correctForm}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function efnBuildSlide3Flashcards(meeting) {
-            const cardsHtml = meeting.flashcards.map(function (fc, idx) {
-                return '<div class="flashcard-perspective cursor-pointer" data-flip-card="' + idx + '">' +
-                    '<div id="efn-fc-inner-' + idx + '" class="flashcard-inner shadow-md">' +
-                        '<div class="flashcard-face bg-gradient-to-br from-indigo-600 to-slate-900 text-white border border-indigo-500">' +
-                            '<div class="flex items-center justify-between">' +
-                                '<span class="px-2.5 py-0.5 rounded-lg bg-white/15 text-[11px] font-bold">Kosakata #' + (idx + 1) + '</span>' +
-                                '<button type="button" data-speak="' + efnEscHtml(fc.word) + '" ' +
-                                    'class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-sm cursor-pointer" title="Dengarkan Pelafalan">🔊</button>' +
-                            '</div>' +
-                            '<div class="text-center my-auto">' +
-                                '<div class="text-2xl font-black tracking-tight">' + efnEscHtml(fc.word) + '</div>' +
-                                '<div class="text-xs font-mono text-indigo-200 mt-1">' + efnEscHtml(fc.phonetic) + '</div>' +
-                            '</div>' +
-                            '<div class="text-center text-[11px] font-semibold text-amber-300">Klik kartu untuk melihat arti ↻</div>' +
-                        '</div>' +
-                        '<div class="flashcard-face flashcard-back bg-emerald-50 border-2 border-emerald-400 text-slate-900">' +
-                            '<div class="flex items-center justify-between">' +
-                                '<span class="text-xs font-extrabold text-emerald-800 uppercase">Arti &amp; Contoh</span>' +
-                                '<button type="button" data-speak="' + efnEscHtml(fc.example) + '" ' +
-                                    'class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold cursor-pointer">🔊 Contoh</button>' +
-                            '</div>' +
-                            '<div class="my-auto space-y-2">' +
-                                '<div class="text-lg font-black text-emerald-950">' + efnEscHtml(fc.meaning) + '</div>' +
-                                '<p class="text-xs text-slate-700 italic bg-white p-2.5 rounded-xl border border-emerald-200">"' + efnEscHtml(fc.example) + '"</p>' +
-                            '</div>' +
-                            '<div class="text-center text-[11px] font-bold text-emerald-700">Klik untuk kembali ↺</div>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
-            }).join("");
+            return `
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                            <h3 class="text-xl font-black text-slate-900">🃏 Kartu Kosakata 3D Interaktif</h3>
+                            <p class="text-xs sm:text-sm text-slate-600">Klik kartu untuk membalik dan melihat arti serta contoh kalimatnya</p>
+                        </div>
+                        <button type="button" onclick="efnFlipAllFlashcards()"
+                            class="px-4 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-extrabold text-xs transition cursor-pointer">
+                            🔄 Balik Semua Kartu
+                        </button>
+                    </div>
 
-            return '<div class="space-y-4">' +
-                '<div class="flex flex-wrap items-center justify-between gap-2">' +
-                    '<div>' +
-                        '<h3 class="text-xl font-black text-slate-900">🃏 Kartu Kosakata 3D Interaktif</h3>' +
-                        '<p class="text-xs sm:text-sm text-slate-600">Klik kartu untuk membalik dan melihat arti serta contoh kalimatnya</p>' +
-                    '</div>' +
-                    '<button type="button" id="efn-flip-all-btn" ' +
-                        'class="px-4 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-extrabold text-xs transition cursor-pointer">' +
-                        '🔄 Balik Semua Kartu' +
-                    '</button>' +
-                '</div>' +
-                '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">' + cardsHtml + '</div>' +
-            '</div>';
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        ${meeting.flashcards.map((fc, idx) => `
+                            <div class="flashcard-perspective cursor-pointer" onclick="efnToggleFlashcard(${idx})">
+                                <div id="efn-fc-inner-${idx}" class="flashcard-inner shadow-md">
+                                    <div class="flashcard-face bg-gradient-to-br from-indigo-600 to-slate-900 text-white border border-indigo-500">
+                                        <div class="flex items-center justify-between">
+                                            <span class="px-2.5 py-0.5 rounded-lg bg-white/15 text-[11px] font-bold">Kosakata #${idx + 1}</span>
+                                            <button type="button" onclick="event.stopPropagation(); efnSpeak('${fc.word.replace(/'/g, "\\'")}')"
+                                                class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-sm cursor-pointer" title="Dengarkan Pelafalan">
+                                                🔊
+                                            </button>
+                                        </div>
+                                        <div class="text-center my-auto">
+                                            <div class="text-2xl font-black tracking-tight">${fc.word}</div>
+                                            <div class="text-xs font-mono text-indigo-200 mt-1">${fc.phonetic}</div>
+                                        </div>
+                                        <div class="text-center text-[11px] font-semibold text-amber-300">
+                                            Klik kartu untuk melihat arti ↻
+                                        </div>
+                                    </div>
+
+                                    <div class="flashcard-face flashcard-back bg-emerald-50 border-2 border-emerald-400 text-slate-900">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-extrabold text-emerald-800 uppercase">Arti &amp; Contoh</span>
+                                            <button type="button" onclick="event.stopPropagation(); efnSpeak('${fc.example.replace(/'/g, "\\'")}')"
+                                                class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold cursor-pointer">
+                                                🔊 Contoh
+                                            </button>
+                                        </div>
+                                        <div class="my-auto space-y-2">
+                                            <div class="text-lg font-black text-emerald-950">${fc.meaning}</div>
+                                            <p class="text-xs text-slate-700 italic bg-white p-2.5 rounded-xl border border-emerald-200">
+                                                "${fc.example}"
+                                            </p>
+                                        </div>
+                                        <div class="text-center text-[11px] font-bold text-emerald-700">
+                                            Klik untuk kembali ↺
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `;
+        }
+
+        function efnToggleFlashcard(idx) {
+            const el = document.getElementById(`efn-fc-inner-${idx}`);
+            if (el) el.classList.toggle("is-flipped");
         }
 
         function efnFlipAllFlashcards() {
             const cards = document.querySelectorAll(".flashcard-inner");
-            const anyUnflipped = Array.from(cards).some(function (c) { return !c.classList.contains("is-flipped"); });
-            cards.forEach(function (c) {
+            const anyUnflipped = Array.from(cards).some((c) => !c.classList.contains("is-flipped"));
+            cards.forEach((c) => {
                 if (anyUnflipped) c.classList.add("is-flipped");
                 else c.classList.remove("is-flipped");
             });
         }
 
         function efnBuildSlide4Reading(meeting) {
-            const sentencesHtml = meeting.sentences.map(function (s, idx) {
-                return '<div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">' +
-                    '<div class="flex items-start justify-between gap-2">' +
-                        '<p class="text-sm sm:text-base font-extrabold text-indigo-950">' + (idx + 1) + '. "' + efnEscHtml(s.en) + '"</p>' +
-                        '<button type="button" data-speak="' + efnEscHtml(s.en) + '" ' +
-                            'class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold shrink-0 cursor-pointer">🔊</button>' +
-                    '</div>' +
-                    '<p class="text-xs sm:text-sm text-slate-700 font-medium">Artinya: ' + efnEscHtml(s.id) + '</p>' +
-                    '<div class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">💡 Catatan: ' + efnEscHtml(s.note) + '</div>' +
-                '</div>';
-            }).join("");
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-6 p-5 sm:p-6 rounded-3xl bg-slate-900 text-white space-y-4 shadow-md">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 font-extrabold text-xs">📖 Teks Bacaan</span>
+                            <button type="button" onclick="efnSpeak(\`${meeting.readingText.replace(/"/g, "'")}\`)"
+                                class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold cursor-pointer">
+                                🔊 Dengarkan Bacaan Penuh
+                            </button>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-black text-white">${meeting.readingTitle}</h3>
+                        <p class="text-sm sm:text-base text-slate-200 leading-relaxed">
+                            ${meeting.readingText}
+                        </p>
+                    </div>
 
-            return '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">' +
-                '<div class="lg:col-span-6 p-5 sm:p-6 rounded-3xl bg-slate-900 text-white space-y-4 shadow-md">' +
-                    '<div class="flex items-center justify-between gap-2">' +
-                        '<span class="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 font-extrabold text-xs">📖 Teks Bacaan</span>' +
-                        '<button type="button" data-speak="' + efnEscHtml(meeting.readingText) + '" ' +
-                            'class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold cursor-pointer">🔊 Dengarkan Bacaan Penuh</button>' +
-                    '</div>' +
-                    '<h3 class="text-xl sm:text-2xl font-black text-white">' + efnEscHtml(meeting.readingTitle) + '</h3>' +
-                    '<p class="text-sm sm:text-base text-slate-200 leading-relaxed">' + efnEscHtml(meeting.readingText) + '</p>' +
-                '</div>' +
-                '<div class="lg:col-span-6 space-y-4">' +
-                    '<h4 class="text-lg font-black text-slate-900">🔍 Bedah Struktur Kalimat Kunci</h4>' +
-                    sentencesHtml +
-                '</div>' +
-            '</div>';
+                    <div class="lg:col-span-6 space-y-4">
+                        <h4 class="text-lg font-black text-slate-900">🔍 Bedah Struktur Kalimat Kunci</h4>
+                        ${meeting.sentences.map((s, idx) => `
+                            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                                <div class="flex items-start justify-between gap-2">
+                                    <p class="text-sm sm:text-base font-extrabold text-indigo-950">${idx + 1}. "${s.en}"</p>
+                                    <button type="button" onclick="efnSpeak(\`${s.en.replace(/"/g, "'")}\`)"
+                                        class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-bold shrink-0 cursor-pointer">🔊</button>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-700 font-medium">Artinya: ${s.id}</p>
+                                <div class="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+                                    💡 Catatan: ${s.note}
+                                </div>
+                            </div>
+                        `).join("")}
+                    </div>
+                </div>
+            `;
         }
 
         function efnBuildSlide5BuilderQuiz(meeting) {
             const targetWords = meeting.builderWords || [];
-            const shuffled = targetWords.slice().sort(function (a, b) { return a.localeCompare(b); });
+            const shuffled = [...targetWords].sort((a, b) => a.localeCompare(b));
             const currentBuilt = efnState.builderSelected.join(" ");
             const targetSentence = targetWords.join(" ");
             const isBuilderCorrect = currentBuilt === targetSentence;
 
-            const selectedHtml = efnState.builderSelected.length === 0
-                ? '<span class="text-xs text-slate-400 font-semibold">Susunan kalimat akan muncul di sini...</span>'
-                : efnState.builderSelected.map(function (w, i) {
-                    return '<button type="button" data-remove-word="' + i + '" ' +
-                        'class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-sm cursor-pointer">' + efnEscHtml(w) + '</button>';
-                }).join("");
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-6 p-5 rounded-3xl bg-indigo-50/70 border border-indigo-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-black text-indigo-950">🧩 Susun Kalimat (Sentence Builder)</h3>
+                            <button type="button" onclick="efnResetBuilder()"
+                                class="px-3 py-1 rounded-xl bg-white border border-indigo-200 text-indigo-800 text-xs font-extrabold cursor-pointer">
+                                ↺ Ulangi
+                            </button>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-700">Klik potongan kata di bawah ini secara berurutan hingga membentuk kalimat yang tepat:</p>
 
-            const successBanner = isBuilderCorrect
-                ? '<div class="p-3 rounded-2xl bg-emerald-600 text-white text-xs sm:text-sm font-extrabold flex items-center justify-between">' +
-                    '<span>🎉 Hebat! Susunan kalimat sudah 100% benar!</span>' +
-                    '<button type="button" data-speak="' + efnEscHtml(targetSentence) + '" class="px-2.5 py-1 rounded-lg bg-white text-emerald-800 text-xs font-black cursor-pointer">🔊 Dengarkan</button>' +
-                  '</div>'
-                : "";
+                        <div class="min-h-[64px] p-3.5 rounded-2xl bg-white border-2 ${isBuilderCorrect ? "border-emerald-500 bg-emerald-50" : "border-dashed border-indigo-300"} flex flex-wrap items-center gap-2">
+                            ${efnState.builderSelected.length === 0
+                                ? `<span class="text-xs text-slate-400 font-semibold">Susunan kalimat akan muncul di sini...</span>`
+                                : efnState.builderSelected.map((w, i) => `
+                                    <button type="button" onclick="efnRemoveBuilderWord(${i})"
+                                        class="px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-sm cursor-pointer">
+                                        ${w}
+                                    </button>
+                                `).join("")
+                            }
+                        </div>
 
-            const wordButtonsHtml = shuffled.map(function (word) {
-                return '<button type="button" data-add-word="' + efnEscHtml(word) + '" ' +
-                    'class="px-3.5 py-2 rounded-xl bg-white hover:bg-indigo-100 text-slate-900 border border-slate-300 font-bold text-sm shadow-sm transition cursor-pointer">' + efnEscHtml(word) + '</button>';
-            }).join("");
+                        ${isBuilderCorrect ? `
+                            <div class="p-3 rounded-2xl bg-emerald-600 text-white text-xs sm:text-sm font-extrabold flex items-center justify-between">
+                                <span>🎉 Hebat! Susunan kalimat sudah 100% benar!</span>
+                                <button type="button" onclick="efnSpeak('${targetSentence.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-lg bg-white text-emerald-800 text-xs font-black cursor-pointer">🔊 Dengarkan</button>
+                            </div>
+                        ` : ""}
 
-            const extraQuizList = (meeting.quizzes || []).concat([
-                {
-                    type: "tf",
-                    question: 'True / False: Kalimat "' + meeting.correctForm + '" sudah ditulis dengan tata bahasa yang tepat.',
-                    options: ["TRUE (Benar)", "FALSE (Salah)"],
-                    answer: 0,
-                    explanation: 'Benar (TRUE)! "' + meeting.correctForm + '" mengikuti pola kalimat yang tepat.'
-                },
-                {
-                    type: "tf",
-                    question: 'True / False: Kalimat "' + meeting.commonMistake + '" merupakan bentuk penulisan baku yang benar.',
-                    options: ["TRUE (Benar)", "FALSE (Salah)"],
-                    answer: 1,
-                    explanation: 'Salah (FALSE)! Bentuk yang benar seharusnya "' + meeting.correctForm + '".'
-                }
-            ]);
+                        <div class="flex flex-wrap gap-2 pt-1">
+                            ${shuffled.map((word) => `
+                                <button type="button" onclick="efnAddBuilderWord('${word.replace(/'/g, "\\'")}')"
+                                    class="px-3.5 py-2 rounded-xl bg-white hover:bg-indigo-100 text-slate-900 border border-slate-300 font-bold text-sm shadow-sm transition cursor-pointer">
+                                    ${word}
+                                </button>
+                            `).join("")}
+                        </div>
+                    </div>
 
-            const quizzesHtml = extraQuizList.map(function (qz, qIdx) {
-                const chosen = efnState.meetingQuizAnswers[qIdx];
-                const hasAnswered = chosen !== undefined;
-                const isTf = qz.type === "tf" || qz.options.length === 2;
-                const badgeHtml = isTf
-                    ? '<span class="inline-block px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-900 text-[11px] font-extrabold">⚖️ True / False</span>'
-                    : '<span class="inline-block px-2.5 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 text-[11px] font-extrabold">📝 Pilihan Ganda</span>';
+                    <div class="lg:col-span-6 space-y-4">
+                        <h3 class="text-lg font-black text-slate-900">✅ Kuis Pemahaman Kelas</h3>
+                        ${meeting.quizzes.map((qz, qIdx) => {
+                            const chosen = efnState.meetingQuizAnswers[qIdx];
+                            const hasAnswered = chosen !== undefined;
+                            return `
+                                <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-3">
+                                    <p class="text-sm sm:text-base font-extrabold text-slate-900">${qz.question}</p>
+                                    <div class="space-y-2">
+                                        ${qz.options.map((opt, optIdx) => {
+                                            let cls = "bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-800";
+                                            if (hasAnswered) {
+                                                if (optIdx === qz.answer) cls = "bg-emerald-600 border-emerald-600 text-white";
+                                                else if (optIdx === chosen) cls = "bg-rose-600 border-rose-600 text-white";
+                                            }
+                                            return `
+                                                <button type="button" onclick="efnAnswerMeetingQuiz(${qIdx}, ${optIdx})"
+                                                    class="w-full text-left px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition cursor-pointer ${cls}">
+                                                    ${String.fromCharCode(65 + optIdx)}. ${opt}
+                                                </button>
+                                            `;
+                                        }).join("")}
+                                    </div>
+                                    ${hasAnswered ? `
+                                        <div class="p-3 rounded-xl ${chosen === qz.answer ? "bg-emerald-50 text-emerald-900 border border-emerald-200" : "bg-amber-50 text-amber-900 border border-amber-200"} text-xs font-semibold">
+                                            <strong>${chosen === qz.answer ? "Benar!" : "Pembahasan:"}</strong> ${qz.explanation}
+                                        </div>
+                                    ` : ""}
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                </div>
+            `;
+        }
 
-                const optsHtml = qz.options.map(function (opt, optIdx) {
-                    let cls = "bg-slate-50 hover:bg-indigo-50 border-slate-200 text-slate-800";
-                    if (hasAnswered) {
-                        if (optIdx === qz.answer) cls = "bg-emerald-600 border-emerald-600 text-white";
-                        else if (optIdx === chosen) cls = "bg-rose-600 border-rose-600 text-white";
-                    }
-                    const prefix = isTf ? (optIdx === 0 ? "✅ " : "❌ ") : (String.fromCharCode(65 + optIdx) + ". ");
-                    return '<button type="button" data-meeting-quiz="' + qIdx + '" data-quiz-opt="' + optIdx + '" ' +
-                        'class="w-full text-left px-4 py-2.5 rounded-xl border font-bold text-xs sm:text-sm transition cursor-pointer ' + cls + '">' +
-                        prefix + efnEscHtml(opt) +
-                    '</button>';
-                }).join("");
+        function efnAddBuilderWord(word) {
+            efnState.builderSelected.push(word);
+            const target = (efnGetCurrentMeeting().builderWords || []).join(" ");
+            if (efnState.builderSelected.join(" ") === target) {
+                efnSpeak(target);
+            }
+            efnRenderClassroom();
+        }
 
-                const explainHtml = hasAnswered
-                    ? '<div class="p-3 rounded-xl ' + (chosen === qz.answer ? "bg-emerald-50 text-emerald-900 border border-emerald-200" : "bg-amber-50 text-amber-900 border border-amber-200") + ' text-xs font-semibold">' +
-                        '<strong>' + (chosen === qz.answer ? "Benar!" : "Pembahasan:") + '</strong> ' + efnEscHtml(qz.explanation) +
-                      '</div>'
-                    : "";
+        function efnRemoveBuilderWord(index) {
+            efnState.builderSelected.splice(index, 1);
+            efnRenderClassroom();
+        }
 
-                return '<div class="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-2.5">' +
-                    '<div class="flex items-center justify-between">' + badgeHtml + '<span class="text-[11px] font-bold text-slate-400">Soal #' + (qIdx + 1) + '</span></div>' +
-                    '<p class="text-sm sm:text-base font-extrabold text-slate-900">' + efnEscHtml(qz.question) + '</p>' +
-                    '<div class="' + (isTf ? "grid grid-cols-2 gap-2.5" : "space-y-2") + '">' + optsHtml + '</div>' +
-                    explainHtml +
-                '</div>';
-            }).join("");
+        function efnResetBuilder() {
+            efnState.builderSelected = [];
+            efnRenderClassroom();
+        }
 
-            return '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">' +
-                '<div class="lg:col-span-5 p-5 rounded-3xl bg-indigo-50/70 border border-indigo-200 space-y-4">' +
-                    '<div class="flex items-center justify-between">' +
-                        '<h3 class="text-lg font-black text-indigo-950">🧩 Susun Kalimat</h3>' +
-                        '<button type="button" id="efn-reset-builder-btn" class="px-3 py-1 rounded-xl bg-white border border-indigo-200 text-indigo-800 text-xs font-extrabold cursor-pointer">↺ Ulangi</button>' +
-                    '</div>' +
-                    '<p class="text-xs sm:text-sm text-slate-700">Klik potongan kata secara berurutan hingga membentuk kalimat tepat:</p>' +
-                    '<div class="min-h-[64px] p-3.5 rounded-2xl bg-white border-2 ' + (isBuilderCorrect ? "border-emerald-500 bg-emerald-50" : "border-dashed border-indigo-300") + ' flex flex-wrap items-center gap-2">' +
-                        selectedHtml +
-                    '<p class="text-xs sm:text-sm text-slate-700">Klik potongan kata di bawah ini secara berurutan hingga membentuk kalimat yang tepat:</p>' +
-                    '<div class="min-h-[64px] p-3.5 rounded-2xl bg-white border-2 ' + (isBuilderCorrect ? "border-emerald-500 bg-emerald-50" : "border-dashed border-indigo-300") + ' flex flex-wrap items-center gap-2">' +
-                        selectedHtml +
-                    '</div>' +
-                    successBanner +
-                    '<div class="flex flex-wrap gap-2 pt-1">' + wordButtonsHtml + '</div>' +
-                '</div>' +
-                '<div class="lg:col-span-6 space-y-4">' +
-                    '<h3 class="text-lg font-black text-slate-900">✅ Kuis Pemahaman Kelas (PG &amp; True/False)</h3>' +
-                    quizzesHtml +
-                '</div>' +
-            '</div>';
+        function efnAnswerMeetingQuiz(qIdx, optIdx) {
+            efnState.meetingQuizAnswers[qIdx] = optIdx;
+            efnRenderClassroom();
         }
 
         function efnBuildSlide6Summary(meeting, chapter) {
-            const vocabList = meeting.flashcards.map(function (f) { return f.word; }).join(", ");
-            const nextMeetingBtn = efnState.meetingIdx < chapter.meetings.length - 1
-                ? '<button type="button" data-start-meeting="' + (efnState.meetingIdx + 1) + '" ' +
-                    'class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs cursor-pointer">Lanjut Pertemuan ' + (efnState.meetingIdx + 2) + ' →</button>'
-                : "";
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <div class="lg:col-span-7 p-6 rounded-3xl bg-slate-900 text-white space-y-4">
+                        <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">📌 Rangkuman Inti Pertemuan</span>
+                        <h3 class="text-xl sm:text-2xl font-black">${meeting.unitTitle}</h3>
+                        <ul class="space-y-3 text-sm text-slate-200">
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-emerald-400 font-black">✓</span>
+                                <span><strong>Fokus Keterampilan:</strong> ${meeting.skillFocus}</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-emerald-400 font-black">✓</span>
+                                <span><strong>Pola Kalimat Utama:</strong> ${meeting.formulaPositive}</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="text-emerald-400 font-black">✓</span>
+                                <span><strong>Kosakata Kunci:</strong> ${meeting.flashcards.map((f) => f.word).join(", ")}</span>
+                            </li>
+                        </ul>
+                    </div>
 
-            return '<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">' +
-                '<div class="lg:col-span-7 p-6 rounded-3xl bg-slate-900 text-white space-y-4">' +
-                    '<span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-xs">📌 Rangkuman Inti Pertemuan</span>' +
-                    '<h3 class="text-xl sm:text-2xl font-black">' + efnEscHtml(meeting.unitTitle) + '</h3>' +
-                    '<ul class="space-y-3 text-sm text-slate-200">' +
-                        '<li class="flex items-start gap-2.5"><span class="text-emerald-400 font-black">✓</span><span><strong>Fokus Keterampilan:</strong> ' + efnEscHtml(meeting.skillFocus) + '</span></li>' +
-                        '<li class="flex items-start gap-2.5"><span class="text-emerald-400 font-black">✓</span><span><strong>Pola Kalimat Utama:</strong> ' + efnEscHtml(meeting.formulaPositive) + '</span></li>' +
-                        '<li class="flex items-start gap-2.5"><span class="text-emerald-400 font-black">✓</span><span><strong>Kosakata Kunci:</strong> ' + efnEscHtml(vocabList) + '</span></li>' +
-                    '</ul>' +
-                '</div>' +
-                '<div class="lg:col-span-5 p-6 rounded-3xl bg-amber-50 border border-amber-200 flex flex-col justify-between space-y-4">' +
-                    '<div class="space-y-2">' +
-                        '<span class="px-3 py-1 rounded-full bg-amber-200 text-amber-950 font-extrabold text-xs">💭 Pertanyaan Refleksi Siswa</span>' +
-                        '<h4 class="text-lg font-black text-slate-900 mt-2">Diskusi Penutup Kelas</h4>' +
-                        '<p class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">"' + efnEscHtml(meeting.reflection) + '"</p>' +
-                    '</div>' +
-                    '<div class="pt-3 border-t border-amber-200 flex flex-wrap gap-2">' +
-                        '<button type="button" id="efn-summary-spinner-btn" ' +
-                            'class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs cursor-pointer">🎲 Pilih Siswa Menjawab Refleksi</button>' +
-                        nextMeetingBtn +
-                    '</div>' +
-                '</div>' +
-            '</div>';
+                    <div class="lg:col-span-5 p-6 rounded-3xl bg-amber-50 border border-amber-200 flex flex-col justify-between space-y-4">
+                        <div class="space-y-2">
+                            <span class="px-3 py-1 rounded-full bg-amber-200 text-amber-950 font-extrabold text-xs">💭 Pertanyaan Refleksi Siswa</span>
+                            <h4 class="text-lg font-black text-slate-900 mt-2">Diskusi Penutup Kelas</h4>
+                            <p class="text-sm sm:text-base font-semibold text-slate-800 leading-relaxed">
+                                "${meeting.reflection}"
+                            </p>
+                        </div>
+
+                        <div class="pt-3 border-t border-amber-200 flex flex-wrap gap-2">
+                            <button type="button" onclick="efnOpenStudentSpinner()"
+                                class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs cursor-pointer">
+                                🎲 Pilih Siswa Menjawab Refleksi
+                            </button>
+                            ${efnState.meetingIdx < chapter.meetings.length - 1 ? `
+                                <button type="button" onclick="efnStartMeeting(${efnState.meetingIdx + 1})"
+                                    class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs cursor-pointer">
+                                    Lanjut Pertemuan ${efnState.meetingIdx + 2} →
+                                </button>
+                            ` : ""}
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
+        // =========================================================================
+        // RENDER VIEW 3: PUSAT UJIAN & EVALUASI CBT
+        // =========================================================================
         function efnOpenExamCenter() {
             document.getElementById("efn-roadmap-view").classList.add("hidden");
             document.getElementById("efn-classroom-view").classList.add("hidden");
@@ -2415,137 +2481,150 @@
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
+        function efnSelectExamPackage(idx) {
+            efnState.examIdx = idx;
+            efnState.examAnswers = {};
+            efnState.examSubmitted = false;
+            efnRenderExamView();
+        }
+
         function efnRenderExamView() {
             const gradeRoman = efnState.grade === 7 ? "VII" : efnState.grade === 8 ? "VIII" : "IX";
-            document.getElementById("efn-exam-grade-label").textContent = "Evaluasi CBT • Kelas " + gradeRoman;
+            document.getElementById("efn-exam-grade-label").textContent = `Evaluasi CBT • Kelas ${gradeRoman}`;
 
             const packages = efnExamsByGrade[efnState.grade] || [];
             const activePkg = packages[efnState.examIdx] || packages[0];
 
-            document.getElementById("efn-exam-tabs").innerHTML = packages.map(function (pkg, idx) {
-                return '<button type="button" data-select-exam="' + idx + '" ' +
-                    'class="px-4 py-2.5 rounded-2xl font-extrabold text-xs sm:text-sm border transition cursor-pointer ' +
-                    (idx === efnState.examIdx ? "bg-indigo-600 text-white border-indigo-600 shadow-sm" : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100") + '">' +
-                    efnEscHtml(pkg.title) +
-                '</button>';
-            }).join("");
+            document.getElementById("efn-exam-tabs").innerHTML = packages.map((pkg, idx) => `
+                <button type="button" onclick="efnSelectExamPackage(${idx})"
+                    class="px-4 py-2.5 rounded-2xl font-extrabold text-xs sm:text-sm border transition cursor-pointer ${
+                        idx === efnState.examIdx
+                            ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                            : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+                    }">
+                    ${pkg.title}
+                </button>
+            `).join("");
 
             if (!activePkg) return;
-
-            const allExamQuestions = activePkg.questions.concat([
-                {
-                    type: "tf",
-                    q: "True / False: Simple Past Tense digunakan untuk menceritakan kegiatan atau peristiwa yang sudah selesai di masa lampau.",
-                    options: ["TRUE (Benar)", "FALSE (Salah)"],
-                    answer: 0,
-                    explanation: "Benar (TRUE)! Simple Past Tense menggunakan Verb 2 untuk kejadian yang sudah lampau."
-                },
-                {
-                    type: "tf",
-                    q: "True / False: Dalam bahasa Inggris, kata kerja setelah 'mustn't' atau 'should' harus selalu ditambahkan akhiran '-ing'.",
-                    options: ["TRUE (Benar)", "FALSE (Salah)"],
-                    answer: 1,
-                    explanation: "Salah (FALSE)! Modals (should, must, mustn't) selalu diikuti kata kerja bentuk dasar (Verb 1)."
-                }
-            ]);
 
             let scoreHtml = "";
             if (efnState.examSubmitted) {
                 let correct = 0;
-                allExamQuestions.forEach(function (q, i) {
+                activePkg.questions.forEach((q, i) => {
                     if (efnState.examAnswers[i] === q.answer) correct++;
                 });
-                const score = Math.round((correct / allExamQuestions.length) * 100);
-                scoreHtml = '<div class="mb-6 p-5 rounded-2xl bg-emerald-900 text-white flex flex-wrap items-center justify-between gap-4">' +
-                    '<div>' +
-                        '<div class="text-xs uppercase font-bold text-emerald-300">Hasil Evaluasi CBT</div>' +
-                        '<div class="text-2xl sm:text-3xl font-black mt-0.5">Skor: ' + score + ' / 100 (' + correct + ' dari ' + allExamQuestions.length + ' Benar)</div>' +
-                    '</div>' +
-                    '<button type="button" data-select-exam="' + efnState.examIdx + '" ' +
-                        'class="px-4 py-2.5 rounded-xl bg-white text-emerald-950 font-extrabold text-xs cursor-pointer">↺ Ulangi Paket Soal</button>' +
-                '</div>';
+                const score = Math.round((correct / activePkg.questions.length) * 100);
+                scoreHtml = `
+                    <div class="mb-6 p-5 rounded-2xl bg-emerald-900 text-white flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs uppercase font-bold text-emerald-300">Hasil Evaluasi CBT</div>
+                            <div class="text-2xl sm:text-3xl font-black mt-0.5">Skor: ${score} / 100 (${correct} dari ${activePkg.questions.length} Benar)</div>
+                        </div>
+                        <button type="button" onclick="efnSelectExamPackage(${efnState.examIdx})"
+                            class="px-4 py-2.5 rounded-xl bg-white text-emerald-950 font-extrabold text-xs cursor-pointer">
+                            ↺ Ulangi Paket Soal
+                        </button>
+                    </div>
+                `;
             }
 
-            const questionsHtml = allExamQuestions.map(function (q, qIdx) {
+            const questionsHtml = activePkg.questions.map((q, qIdx) => {
                 const chosen = efnState.examAnswers[qIdx];
-                const isTf = q.type === "tf" || q.options.length === 2;
-                const badgeHtml = isTf
-                    ? '<span class="px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-900 text-[11px] font-extrabold">⚖️ True / False</span>'
-                    : '<span class="px-2.5 py-0.5 rounded-lg bg-indigo-100 text-indigo-800 text-[11px] font-extrabold">📝 Pilihan Ganda</span>';
-
-                const optsHtml = q.options.map(function (opt, optIdx) {
-                    let cls = "bg-white hover:bg-indigo-50 border-slate-200 text-slate-800";
-                    if (efnState.examSubmitted) {
-                        if (optIdx === q.answer) cls = "bg-emerald-600 border-emerald-600 text-white";
-                        else if (optIdx === chosen) cls = "bg-rose-600 border-rose-600 text-white";
-                    } else if (chosen === optIdx) {
-                        cls = "bg-indigo-600 border-indigo-600 text-white";
-                    }
-                    const prefix = isTf ? (optIdx === 0 ? "✅ " : "❌ ") : (String.fromCharCode(65 + optIdx) + ". ");
-                    return '<button type="button" data-exam-q="' + qIdx + '" data-exam-opt="' + optIdx + '" ' +
-                        'class="text-left px-4 py-3 rounded-xl border font-bold text-xs sm:text-sm transition cursor-pointer ' + cls + '">' +
-                        prefix + efnEscHtml(opt) +
-                    '</button>';
-                }).join("");
-
-                const explainHtml = efnState.examSubmitted
-                    ? '<div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 font-semibold">💡 <strong>Pembahasan:</strong> ' + efnEscHtml(q.explanation) + '</div>'
-                    : "";
-
-                return '<div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">' +
-                    '<div class="flex items-center justify-between">' + badgeHtml + '<span class="text-xs font-bold text-slate-400">Nomor ' + (qIdx + 1) + '</span></div>' +
-                    '<div class="font-extrabold text-slate-900 text-sm sm:text-base">' + (qIdx + 1) + '. ' + efnEscHtml(q.q) + '</div>' +
-                    '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">' + optsHtml + '</div>' +
-                    explainHtml +
-                '</div>';
+                return `
+                    <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                        <div class="font-extrabold text-slate-900 text-sm sm:text-base">${qIdx + 1}. ${q.q}</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            ${q.options.map((opt, optIdx) => {
+                                let cls = "bg-white hover:bg-indigo-50 border-slate-200 text-slate-800";
+                                if (efnState.examSubmitted) {
+                                    if (optIdx === q.answer) cls = "bg-emerald-600 border-emerald-600 text-white";
+                                    else if (optIdx === chosen) cls = "bg-rose-600 border-rose-600 text-white";
+                                } else if (chosen === optIdx) {
+                                    cls = "bg-indigo-600 border-indigo-600 text-white";
+                                }
+                                return `
+                                    <button type="button" onclick="efnSelectExamAnswer(${qIdx}, ${optIdx})"
+                                        class="text-left px-4 py-3 rounded-xl border font-bold text-xs sm:text-sm transition cursor-pointer ${cls}">
+                                        ${String.fromCharCode(65 + optIdx)}. ${opt}
+                                    </button>
+                                `;
+                            }).join("")}
+                        </div>
+                        ${efnState.examSubmitted ? `
+                            <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 font-semibold">
+                                💡 <strong>Pembahasan:</strong> ${q.explanation}
+                            </div>
+                        ` : ""}
+                    </div>
+                `;
             }).join("");
 
-            const submitHtml = !efnState.examSubmitted
-                ? '<div class="mt-6 flex justify-end">' +
-                    '<button type="button" id="efn-submit-exam-btn" class="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-md cursor-pointer">✓ Kumpulkan &amp; Lihat Nilai</button>' +
-                  '</div>'
-                : "";
-
-            document.getElementById("efn-exam-content").innerHTML =
-                '<div class="mb-5">' +
-                    '<h3 class="text-xl font-black text-slate-900">' + efnEscHtml(activePkg.title) + '</h3>' +
-                    '<p class="text-xs sm:text-sm text-slate-600 mt-1">' + efnEscHtml(activePkg.desc) + '</p>' +
-                '</div>' +
-                scoreHtml +
-                '<div class="space-y-4">' + questionsHtml + '</div>' +
-                submitHtml;
+            document.getElementById("efn-exam-content").innerHTML = `
+                <div class="mb-5">
+                    <h3 class="text-xl font-black text-slate-900">${activePkg.title}</h3>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1">${activePkg.desc}</p>
+                </div>
+                ${scoreHtml}
+                <div class="space-y-4">${questionsHtml}</div>
+                ${!efnState.examSubmitted ? `
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" onclick="efnSubmitExam()"
+                            class="px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-md cursor-pointer">
+                            ✓ Kumpulkan &amp; Lihat Nilai
+                        </button>
+                    </div>
+                ` : ""}
+            `;
         }
 
+        function efnSelectExamAnswer(qIdx, optIdx) {
+            if (efnState.examSubmitted) return;
+            efnState.examAnswers[qIdx] = optIdx;
+            efnRenderExamView();
+        }
+
+        function efnSubmitExam() {
+            efnState.examSubmitted = true;
+            efnRenderExamView();
+            efnShowToast("Jawaban CBT berhasil dikumpulkan!");
+        }
+
+        // =========================================================================
+        // ALAT BANTU PROYEKTOR: LASER POINTER, FULLSCREEN, TIMER, SPINNER & KAMUS
+        // =========================================================================
         function efnToggleLaserPointer() {
             efnState.laserActive = !efnState.laserActive;
             const dot = document.getElementById("efn-laser-dot");
             const btn = document.getElementById("efn-laser-btn");
             if (efnState.laserActive) {
+                document.body.classList.add("laser-mode");
                 dot.style.display = "block";
-                btn.classList.add("ring-2", "ring-rose-500", "bg-rose-100");
+                btn.classList.add("ring-2", "ring-rose-500");
                 efnShowToast("🔴 Laser Pointer Aktif (Tekan L untuk mematikan)");
             } else {
+                document.body.classList.remove("laser-mode");
                 dot.style.display = "none";
-                btn.classList.remove("ring-2", "ring-rose-500", "bg-rose-100");
+                btn.classList.remove("ring-2", "ring-rose-500");
             }
         }
 
-        document.addEventListener("mousemove", function (e) {
+        document.addEventListener("mousemove", (e) => {
             if (!efnState.laserActive) return;
             const dot = document.getElementById("efn-laser-dot");
             if (dot) {
-                dot.style.left = e.clientX + "px";
-                dot.style.top = e.clientY + "px";
+                dot.style.left = `${e.clientX}px`;
+                dot.style.top = `${e.clientY}px`;
             }
         });
 
         function efnTogglePresentationFullscreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function () {
+                document.documentElement.requestFullscreen().catch(() => {
                     efnShowToast("Gunakan tombol F11 pada keyboard untuk layar penuh.");
                 });
             } else {
-                document.exitFullscreen().catch(function () {});
+                document.exitFullscreen().catch(() => {});
             }
         }
 
@@ -2554,7 +2633,7 @@
             if (!disp) return;
             const mins = String(Math.floor(efnState.timerSeconds / 60)).padStart(2, "0");
             const secs = String(efnState.timerSeconds % 60).padStart(2, "0");
-            disp.textContent = mins + ":" + secs;
+            disp.textContent = `${mins}:${secs}`;
         }
 
         function efnPauseClassTimer() {
@@ -2572,7 +2651,7 @@
             }
             efnState.timerRunning = true;
             if (btn) btn.textContent = "❚❚";
-            efnState.timerInterval = setInterval(function () {
+            efnState.timerInterval = setInterval(() => {
                 if (efnState.timerSeconds > 0) {
                     efnState.timerSeconds--;
                     efnUpdateTimerDisplay();
@@ -2594,15 +2673,18 @@
         function efnToggleSlideOverview() {
             const modal = document.getElementById("efn-slide-overview-modal");
             const grid = document.getElementById("efn-slide-overview-grid");
-            grid.innerHTML = efnStageTemplates.map(function (st, idx) {
-                return '<button type="button" data-overview-stage="' + idx + '" ' +
-                    'class="text-left p-4 rounded-2xl border transition cursor-pointer ' +
-                    (idx === efnState.stageIdx ? "bg-indigo-600 text-white border-indigo-600 shadow-md" : "bg-slate-50 hover:bg-indigo-50 text-slate-900 border-slate-200") + '">' +
-                    '<div class="text-xs font-extrabold opacity-80">' + efnEscHtml(st.slot) + '</div>' +
-                    '<div class="font-black text-sm mt-1">' + efnEscHtml(st.label) + '</div>' +
-                    '<p class="text-xs mt-1.5 opacity-90">' + efnEscHtml(st.goal) + '</p>' +
-                '</button>';
-            }).join("");
+            grid.innerHTML = efnStageTemplates.map((st, idx) => `
+                <button type="button" onclick="efnGoToStage(${idx}); efnCloseSlideOverview();"
+                    class="text-left p-4 rounded-2xl border transition cursor-pointer ${
+                        idx === efnState.stageIdx
+                            ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                            : "bg-slate-50 hover:bg-indigo-50 text-slate-900 border-slate-200"
+                    }">
+                    <div class="text-xs font-extrabold opacity-80">${st.slot}</div>
+                    <div class="font-black text-sm mt-1">${st.label}</div>
+                    <p class="text-xs mt-1.5 opacity-90">${st.goal}</p>
+                </button>
+            `).join("");
             modal.classList.remove("hidden");
         }
 
@@ -2622,13 +2704,13 @@
             const max = Math.max(5, Math.min(60, Number(document.getElementById("efn-student-count-input").value) || 32));
             const resEl = document.getElementById("efn-spinner-result");
             let ticks = 0;
-            const interval = setInterval(function () {
+            const interval = setInterval(() => {
                 const rand = Math.floor(Math.random() * max) + 1;
-                resEl.textContent = "Absen #" + rand;
+                resEl.textContent = `Absen #${rand}`;
                 ticks++;
                 if (ticks >= 14) {
                     clearInterval(interval);
-                    efnShowToast("🎯 Terpilih Siswa Nomor Absen #" + rand);
+                    efnShowToast(`🎯 Terpilih Siswa Nomor Absen #${rand}`);
                 }
             }, 55);
         }
@@ -2641,7 +2723,7 @@
             document.getElementById("efn-modal-term-formula").textContent = item.formula;
             document.getElementById("efn-modal-term-example").textContent = item.example;
             document.getElementById("efn-modal-term-translation").textContent = item.translation;
-            document.getElementById("efn-modal-speak-btn").setAttribute("data-speak", item.example);
+            document.getElementById("efn-modal-speak-btn").onclick = () => efnSpeak(item.example);
             document.getElementById("efn-glossary-modal").classList.remove("hidden");
         }
 
@@ -2651,13 +2733,13 @@
 
         function efnOpenGlossaryIndex() {
             const list = document.getElementById("efn-glossary-index-list");
-            list.innerHTML = Object.keys(efnGlossaryDB).map(function (key) {
-                return '<button type="button" data-index-glossary="' + efnEscHtml(key) + '" ' +
-                    'class="text-left p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition cursor-pointer">' +
-                    '<div class="font-black text-indigo-800 text-sm">' + efnEscHtml(key) + '</div>' +
-                    '<p class="text-xs text-slate-600 mt-1 line-clamp-2">' + efnEscHtml(efnGlossaryDB[key].desc) + '</p>' +
-                '</button>';
-            }).join("");
+            list.innerHTML = Object.keys(efnGlossaryDB).map((key) => `
+                <button type="button" onclick="efnCloseGlossaryIndex(); efnOpenGlossaryModal('${key}');"
+                    class="text-left p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-300 transition cursor-pointer">
+                    <div class="font-black text-indigo-800 text-sm">${key}</div>
+                    <p class="text-xs text-slate-600 mt-1 line-clamp-2">${efnGlossaryDB[key].desc}</p>
+                </button>
+            `).join("");
             document.getElementById("efn-glossary-index-modal").classList.remove("hidden");
         }
 
@@ -2665,148 +2747,9 @@
             document.getElementById("efn-glossary-index-modal").classList.add("hidden");
         }
 
-        function efnCloseAllModals() {
-            efnCloseGlossaryModal();
-            efnCloseGlossaryIndex();
-            efnCloseSlideOverview();
-            efnCloseStudentSpinner();
-        }
-
-        document.addEventListener("click", function (e) {
-            const target = e.target;
-
-            const speakBtn = target.closest("[data-speak]");
-            if (speakBtn) {
-                e.stopPropagation();
-                efnSpeak(speakBtn.getAttribute("data-speak"));
-                return;
-            }
-
-            const glossaryBtn = target.closest("[data-glossary]");
-            if (glossaryBtn) {
-                efnOpenGlossaryModal(glossaryBtn.getAttribute("data-glossary"));
-                return;
-            }
-
-            const idxGlossaryBtn = target.closest("[data-index-glossary]");
-            if (idxGlossaryBtn) {
-                efnCloseGlossaryIndex();
-                efnOpenGlossaryModal(idxGlossaryBtn.getAttribute("data-index-glossary"));
-                return;
-            }
-
-            const meetingCard = target.closest("[data-start-meeting]");
-            if (meetingCard) {
-                efnStartMeeting(Number(meetingCard.getAttribute("data-start-meeting")));
-                return;
-            }
-
-            const stageBtn = target.closest("[data-go-stage]");
-            if (stageBtn) {
-                efnGoToStage(Number(stageBtn.getAttribute("data-go-stage")));
-                return;
-            }
-
-            const overviewBtn = target.closest("[data-overview-stage]");
-            if (overviewBtn) {
-                efnGoToStage(Number(overviewBtn.getAttribute("data-overview-stage")));
-                efnCloseSlideOverview();
-                return;
-            }
-
-            const hotspotBtn = target.closest("[data-select-hotspot]");
-            if (hotspotBtn) {
-                efnState.activeHotspotIdx = Number(hotspotBtn.getAttribute("data-select-hotspot"));
-                efnRenderClassroom();
-                return;
-            }
-
-            const flipCard = target.closest("[data-flip-card]");
-            if (flipCard) {
-                const idx = flipCard.getAttribute("data-flip-card");
-                const inner = document.getElementById("efn-fc-inner-" + idx);
-                if (inner) inner.classList.toggle("is-flipped");
-                return;
-            }
-
-            if (target.closest("#efn-flip-all-btn")) {
-                efnFlipAllFlashcards();
-                return;
-            }
-
-            const addWordBtn = target.closest("[data-add-word]");
-            if (addWordBtn) {
-                const word = addWordBtn.getAttribute("data-add-word");
-                efnState.builderSelected.push(word);
-                const fullTarget = (efnGetCurrentMeeting().builderWords || []).join(" ");
-                if (efnState.builderSelected.join(" ") === fullTarget) {
-                    efnSpeak(fullTarget);
-                }
-                efnRenderClassroom();
-                return;
-            }
-
-            const removeWordBtn = target.closest("[data-remove-word]");
-            if (removeWordBtn) {
-                efnState.builderSelected.splice(Number(removeWordBtn.getAttribute("data-remove-word")), 1);
-                efnRenderClassroom();
-                return;
-            }
-
-            if (target.closest("#efn-reset-builder-btn")) {
-                efnState.builderSelected = [];
-                efnRenderClassroom();
-                return;
-            }
-
-            const meetingQuizBtn = target.closest("[data-meeting-quiz]");
-            if (meetingQuizBtn) {
-                const qIdx = Number(meetingQuizBtn.getAttribute("data-meeting-quiz"));
-                const optIdx = Number(meetingQuizBtn.getAttribute("data-quiz-opt"));
-                efnState.meetingQuizAnswers[qIdx] = optIdx;
-                efnRenderClassroom();
-                return;
-            }
-
-            if (target.closest("#efn-summary-spinner-btn")) {
-                efnOpenStudentSpinner();
-                return;
-            }
-
-            const examTabBtn = target.closest("[data-select-exam]");
-            if (examTabBtn) {
-                efnState.examIdx = Number(examTabBtn.getAttribute("data-select-exam"));
-                efnState.examAnswers = {};
-                efnState.examSubmitted = false;
-                efnRenderExamView();
-                return;
-            }
-
-            const examOptBtn = target.closest("[data-exam-q]");
-            if (examOptBtn) {
-                if (!efnState.examSubmitted) {
-                    const qIdx = Number(examOptBtn.getAttribute("data-exam-q"));
-                    const optIdx = Number(examOptBtn.getAttribute("data-exam-opt"));
-                    efnState.examAnswers[qIdx] = optIdx;
-                    efnRenderExamView();
-                }
-                return;
-            }
-
-            if (target.closest("#efn-submit-exam-btn")) {
-                efnState.examSubmitted = true;
-                efnRenderExamView();
-                efnShowToast("Jawaban CBT berhasil dikumpulkan!");
-                return;
-            }
-        });
-
-        document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") {
-                efnCloseAllModals();
-                return;
-            }
-            if (document.activeElement && ["INPUT", "SELECT", "TEXTAREA"].indexOf(document.activeElement.tagName) !== -1) return;
+        // Navigasi Keyboard
+        document.addEventListener("keydown", (e) => {
+            if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
             if (e.key === "l" || e.key === "L") {
                 efnToggleLaserPointer();
             }
@@ -2816,12 +2759,13 @@
             if (e.key === "ArrowLeft") efnPrevStage();
         });
 
+        // Dukungan Touch Swipe
         let efnTouchStartX = 0;
-        document.addEventListener("touchstart", function (e) {
+        document.addEventListener("touchstart", (e) => {
             efnTouchStartX = e.changedTouches[0].screenX;
         }, { passive: true });
 
-        document.addEventListener("touchend", function (e) {
+        document.addEventListener("touchend", (e) => {
             const classroomVisible = !document.getElementById("efn-classroom-view").classList.contains("hidden");
             if (!classroomVisible) return;
             const diff = e.changedTouches[0].screenX - efnTouchStartX;
@@ -2831,60 +2775,44 @@
             }
         }, { passive: true });
 
+        // Binding Event Listener Terpusat & Inisialisasi Awal
         function efnInitApp() {
-            try {
-                const bind = function (id, event, handler) {
-                    const el = document.getElementById(id);
-                    if (el) el.addEventListener(event, handler);
-                };
+            document.getElementById("efn-brand-btn").addEventListener("click", efnBackToRoadmap);
+            document.getElementById("efn-back-roadmap-btn").addEventListener("click", efnBackToRoadmap);
+            document.getElementById("efn-exam-back-btn").addEventListener("click", efnBackToRoadmap);
 
-                bind("efn-brand-btn", "click", efnBackToRoadmap);
-                bind("efn-back-roadmap-btn", "click", efnBackToRoadmap);
-                bind("efn-exam-back-btn", "click", efnBackToRoadmap);
-
-                document.querySelectorAll(".efn-grade-tab").forEach(function (btn) {
-                    btn.addEventListener("click", function () {
-                        efnSelectGrade(Number(btn.getAttribute("data-grade")));
-                    });
+            document.querySelectorAll(".efn-grade-tab").forEach((btn) => {
+                btn.addEventListener("click", () => {
+                    efnSelectGrade(Number(btn.getAttribute("data-grade")));
                 });
+            });
 
-                bind("efn-chapter-select", "change", function (e) {
-                    efnSelectChapter(Number(e.target.value));
-                });
+            document.getElementById("efn-chapter-select").addEventListener("change", (e) => {
+                efnSelectChapter(Number(e.target.value));
+            });
 
-                bind("efn-laser-btn", "click", efnToggleLaserPointer);
-                bind("efn-spinner-open-btn", "click", efnOpenStudentSpinner);
-                bind("efn-fullscreen-btn", "click", efnTogglePresentationFullscreen);
-                bind("efn-glossary-open-btn", "click", efnOpenGlossaryIndex);
-                bind("efn-exam-open-btn", "click", efnOpenExamCenter);
-                bind("efn-hero-exam-btn", "click", efnOpenExamCenter);
+            document.getElementById("efn-laser-btn").addEventListener("click", efnToggleLaserPointer);
+            document.getElementById("efn-spinner-open-btn").addEventListener("click", efnOpenStudentSpinner);
+            document.getElementById("efn-fullscreen-btn").addEventListener("click", efnTogglePresentationFullscreen);
+            document.getElementById("efn-glossary-open-btn").addEventListener("click", efnOpenGlossaryIndex);
+            document.getElementById("efn-exam-open-btn").addEventListener("click", efnOpenExamCenter);
+            document.getElementById("efn-hero-exam-btn").addEventListener("click", efnOpenExamCenter);
 
-                bind("efn-start-first-btn", "click", function () { efnStartMeeting(0); });
-                bind("efn-prev-stage-btn", "click", efnPrevStage);
-                bind("efn-next-stage-btn", "click", efnNextStage);
-                bind("efn-slide-overview-btn", "click", efnToggleSlideOverview);
-                bind("efn-class-timer-btn", "click", efnToggleClassTimer);
-                bind("efn-class-timer-reset-btn", "click", efnResetClassTimer);
+            document.getElementById("efn-start-first-btn").addEventListener("click", () => efnStartMeeting(0));
+            document.getElementById("efn-prev-stage-btn").addEventListener("click", efnPrevStage);
+            document.getElementById("efn-next-stage-btn").addEventListener("click", efnNextStage);
+            document.getElementById("efn-slide-overview-btn").addEventListener("click", efnToggleSlideOverview);
+            document.getElementById("efn-class-timer-btn").addEventListener("click", efnToggleClassTimer);
+            document.getElementById("efn-class-timer-reset-btn").addEventListener("click", efnResetClassTimer);
 
-                bind("efn-glossary-modal-close", "click", efnCloseGlossaryModal);
-                bind("efn-glossary-index-close", "click", efnCloseGlossaryIndex);
-                bind("efn-slide-overview-close", "click", efnCloseSlideOverview);
-                bind("efn-spinner-close", "click", efnCloseStudentSpinner);
-                bind("efn-spinner-roll-btn", "click", efnSpinStudentNumber);
+            document.getElementById("efn-glossary-modal-close").addEventListener("click", efnCloseGlossaryModal);
+            document.getElementById("efn-glossary-index-close").addEventListener("click", efnCloseGlossaryIndex);
+            document.getElementById("efn-slide-overview-close").addEventListener("click", efnCloseSlideOverview);
+            document.getElementById("efn-spinner-close").addEventListener("click", efnCloseStudentSpinner);
+            document.getElementById("efn-spinner-roll-btn").addEventListener("click", efnSpinStudentNumber);
 
-                ["efn-glossary-modal", "efn-glossary-index-modal", "efn-slide-overview-modal", "efn-spinner-modal"].forEach(function (modalId) {
-                    const modalEl = document.getElementById(modalId);
-                    if (modalEl) {
-                        modalEl.addEventListener("click", function (e) {
-                            if (e.target === modalEl) modalEl.classList.add("hidden");
-                        });
-                    }
-                });
-
-                efnSelectGrade(8);
-            } catch (err) {
-                console.error("Kesalahan inisialisasi EFN:", err);
-            }
+            // Jalankan tampilan awal Kelas VIII
+            efnSelectGrade(8);
         }
 
         if (document.readyState === "loading") {
@@ -2895,4 +2823,3 @@
     </script>
 </body>
 </html>
-```
