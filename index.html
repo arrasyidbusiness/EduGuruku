@@ -319,7 +319,7 @@
             </div>
 
             <!-- PINTU MASUK: 3 BAGIAN (Ruang Pembelajaran • Siswa • Guru) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-7">
+            <div id="pintu-masuk-utama" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-7">
                 <a href="belajar.html?mode=siswa" class="block bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-3xl p-5 shadow-md transition">
                     <div class="flex items-center gap-3">
                         <div class="w-11 h-11 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl shrink-0">🎮</div>
@@ -328,7 +328,7 @@
                             <h3 class="font-display font-extrabold text-base text-navy mt-1">Ruang Pembelajaran</h3>
                         </div>
                     </div>
-                    <p class="text-xs text-navy-muted mt-3">Belajar langsung lewat slide, kartu kosakata, dan kuis untuk Kelas VII–IX. Tidak perlu akun; kemajuan tidak dicatat.</p>
+                    <p class="text-xs text-navy-muted mt-3">Belajar langsung lewat slide, kartu kosakata, dan latihan Benar/Salah untuk Kelas VII–IX. Tidak perlu akun; kemajuan tidak dicatat.</p>
                     <span class="inline-block mt-3 text-xs font-extrabold text-indigo-700">Mulai belajar →</span>
                 </a>
                 <button type="button" onclick="pintuMasuk('siswa')" class="text-left bg-white border-2 border-sky-200 hover:border-royal rounded-3xl p-5 shadow-md transition cursor-pointer">
@@ -355,7 +355,13 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+            <!-- Bilah kembali: muncul saat kartu login disematkan -->
+            <div id="login-embed-bar" class="hidden mb-4 flex flex-wrap items-center justify-between gap-2">
+                <button type="button" onclick="tutupLogin()" class="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-navy font-extrabold text-xs shadow-sm cursor-pointer">← Kembali ke pilihan</button>
+                <span class="text-[11px] font-bold text-slate-500">Masuk untuk melanjutkan</span>
+            </div>
+            <!-- Kartu login disematkan di sini saat tombol Login Siswa / Login Guru dipilih -->
+            <div id="login-embed" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
                 <!-- KARTU 1: PORTAL SISWA (HANYA NAMA & PIN) -->
                 <div id="login-card-siswa" class="bg-white border-2 border-sky-200 hover:border-royal rounded-3xl p-6 sm:p-8 shadow-xl transition flex flex-col justify-between relative overflow-hidden">
                     <div>
@@ -631,7 +637,7 @@
             <div id="tc-interaktif-card" class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3.5 mb-4 flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div>
                     <p class="font-extrabold text-navy text-sm">🎮 Presentasi &amp; Belajar Interaktif</p>
-                    <p class="text-slate-600">Slide, kartu kosakata 3D, kuis, dan latihan ujian untuk Kelas VII–IX. Siswa mengaksesnya lewat tab <b>🎮 Interaktif</b>; kemajuannya masuk otomatis ke rekap.</p>
+                    <p class="text-slate-600">Slide, kartu kosakata 3D, dan latihan pilihan ganda &amp; Benar/Salah per materi untuk Kelas VII–IX. Siswa mengaksesnya lewat tab <b>🎮 Interaktif</b>; kemajuannya masuk otomatis ke rekap.</p>
                 </div>
                 <button type="button" onclick="bukaInteraktifGuru()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold px-4 py-2 rounded-xl cursor-pointer">Buka Mode Guru (presentasi kelas)</button>
             </div>
@@ -1850,17 +1856,12 @@
         // =========================================================================
         // BELAJAR INTERAKTIF (belajar.html) — tab siswa + penerima kemajuan
         // belajar.html dibuka di dalam iframe (satu alamat situs). Kemajuan pertemuan disimpan di
-        // st.interaktif, skor latihan ujian di st.examResults dengan kunci berawalan "INTERAKTIF •".
+        // st.interaktif berisi kemajuan pertemuan dan hasil latihan (pilihan ganda & Benar/Salah) per pertemuan.
         // =========================================================================
         const INTERAKTIF_FILE = 'belajar.html';
 
         function interaktifGradeNum(r) {
             return r.grade === 'VII' ? 7 : (r.grade === 'VIII' ? 8 : 9);
-        }
-
-        function interaktifLatestExam(st) {
-            const arr = Object.entries(st.examResults || {}).filter(([k]) => k.indexOf('INTERAKTIF') === 0);
-            return arr.length ? arr[arr.length - 1][1] : '';
         }
 
         function interaktifStats(st, gnum) {
@@ -1869,8 +1870,7 @@
             const done = keys.filter(k => prog[k] && prog[k].done).length;
             const quizVals = keys.map(k => prog[k]).filter(v => v && v.quiz && v.quiz[1] > 0);
             const quizAvg = quizVals.length ? Math.round(quizVals.reduce((a, v) => a + v.quiz[0] / v.quiz[1] * 100, 0) / quizVals.length) : null;
-            const exams = Object.entries(st.examResults || {}).filter(([k]) => k.indexOf('INTERAKTIF') === 0);
-            return { done, quizAvg, exams };
+            return { done, quizAvg };
         }
 
         function renderInteraktifSummary(st, gnum) {
@@ -1880,7 +1880,7 @@
             box.innerHTML = `
                 <span class="bg-emerald-50 border border-emerald-200 text-emerald-800 font-extrabold px-2.5 py-1 rounded-lg">✓ Pertemuan selesai: ${sm.done}</span>
                 <span class="bg-blue-50 border border-blue-200 text-blue-800 font-extrabold px-2.5 py-1 rounded-lg">Rata-rata kuis: ${sm.quizAvg === null ? '-' : sm.quizAvg + '%'}</span>
-                <span class="bg-amber-50 border border-amber-200 text-amber-800 font-extrabold px-2.5 py-1 rounded-lg">Latihan ujian: ${sm.exams.length ? sm.exams.map(([, v]) => v).join(', ') : '-'}</span>`;
+                <span class="bg-amber-50 border border-amber-200 text-amber-800 font-extrabold px-2.5 py-1 rounded-lg">Latihan Benar/Salah &amp; pilihan ganda per materi</span>`;
         }
 
         function renderStudentInteraktif(contentEl, sp, r, st) {
@@ -1892,7 +1892,7 @@
                             <h3 class="font-display font-extrabold text-sm text-navy">🎮 Belajar Interaktif Kelas ${r.grade}</h3>
                             <a href="${INTERAKTIF_FILE}?mode=siswa&grade=${gnum}" target="_blank" rel="noopener" class="text-[11px] font-bold text-royal hover:underline">Buka layar penuh ↗</a>
                         </div>
-                        <p class="text-xs text-slate-600">Belajar lewat slide, kartu kosakata 3D, susun kalimat, kuis, dan latihan ujian. Kemajuan dan skor latihan tersimpan otomatis ke akun Anda.</p>
+                        <p class="text-xs text-slate-600">Belajar lewat slide, kartu kosakata 3D, susun kalimat, dan latihan pilihan ganda &amp; Benar/Salah per materi. Kemajuan dan hasil latihan tersimpan otomatis ke akun Anda.</p>
                         <div id="interaktif-summary" class="flex flex-wrap gap-2 text-[11px]"></div>
                     </div>
                     <div id="interaktif-frame-wrap" class="rounded-2xl overflow-hidden border border-cream-border bg-white">
@@ -1946,20 +1946,6 @@
                 if (d.type === 'meeting_done') showToast(`✓ Pertemuan selesai: ${x.meeting || ''}`);
                 scheduleInteraktifSync();
                 return;
-            }
-            if (d.type === 'exam') {
-                const x = d.data || {};
-                if (!x.title || typeof x.score !== 'number') return;
-                if (x.grade !== gnum) return; // skor latihan hanya untuk kelas siswa yang sedang login
-                const k = `INTERAKTIF • ${x.title}`;
-                if (!st.examResults) st.examResults = {};
-                st.examResults[k] = x.score;
-                touchField(st, 'examResults.' + k);
-                persist(true);
-                renderInteraktifSummary(st, gnum);
-                showToast(`Skor latihan tersimpan: ${x.score}/100`);
-                clearTimeout(interaktifSyncTimer);
-                await pushStudentResultToCloud();
             }
         });
 
@@ -2849,15 +2835,33 @@
         // =========================================================================
         // 5. AUTENTIKASI: SISWA (NAMA + PIN), GURU, DAN ADMIN PUSAT
         // =========================================================================
-        // Pintu masuk halaman pembuka: buka kartu login yang dipilih dan arahkan fokus ke isiannya
+        // Pintu masuk halaman pembuka: kartu login (siswa / guru) disematkan dan hanya yang dipilih yang tampil
         function pintuMasuk(peran) {
-            const id = peran === 'guru' ? 'login-card-guru' : 'login-card-siswa';
-            const card = document.getElementById(id);
-            if (!card) return;
-            if (peran === 'siswa') switchStudentTab('login'); else switchTeacherTab('login');
-            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            const first = card.querySelector('input');
+            const embed = document.getElementById('login-embed');
+            const bar = document.getElementById('login-embed-bar');
+            const cardSiswa = document.getElementById('login-card-siswa');
+            const cardGuru = document.getElementById('login-card-guru');
+            if (!embed || !cardSiswa || !cardGuru) return;
+            const isGuru = peran === 'guru';
+            cardSiswa.classList.toggle('hidden', isGuru);
+            cardGuru.classList.toggle('hidden', !isGuru);
+            cardSiswa.classList.toggle('lg:col-span-2', !isGuru);
+            cardGuru.classList.toggle('lg:col-span-2', isGuru);
+            embed.classList.remove('hidden');
+            bar.classList.remove('hidden');
+            if (isGuru) switchTeacherTab('login'); else switchStudentTab('login');
+            bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const first = (isGuru ? cardGuru : cardSiswa).querySelector('input');
             setTimeout(() => { if (first) first.focus({ preventScroll: true }); }, 400);
+        }
+
+        // Tutup kartu login yang disematkan dan kembali ke tiga pilihan utama
+        function tutupLogin() {
+            document.getElementById('login-embed').classList.add('hidden');
+            document.getElementById('login-embed-bar').classList.add('hidden');
+            document.getElementById('login-card-siswa').classList.remove('hidden', 'lg:col-span-2');
+            document.getElementById('login-card-guru').classList.remove('hidden', 'lg:col-span-2');
+            document.getElementById('pintu-masuk-utama')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         function switchStudentTab(tab) {
@@ -5743,7 +5747,7 @@
                 ...uhCols.map(c => `UH ${c.code}`),
                 'STS 1', 'SAS 1', 'Remedial 1', 'Katrol 1', 'Nilai Akhir 1', 'Status 1',
                 'STS 2', 'SAS 2', 'Remedial 2', 'Katrol 2', 'Nilai Akhir 2', 'Status 2',
-                'Skor TKA 1', 'Skor TKA 2', 'Skor Remedial TKA', 'Pertemuan Interaktif Selesai', 'Skor Latihan Interaktif (terakhir)', 'Pelanggaran Ujian', 'Update Terakhir'
+                'Skor TKA 1', 'Skor TKA 2', 'Skor Remedial TKA', 'Pertemuan Interaktif Selesai', 'Rata-rata Latihan Interaktif (%)', 'Pelanggaran Ujian', 'Update Terakhir'
             ];
             const stamp = new Date().toLocaleString('id-ID');
             const rows = [];
@@ -5768,7 +5772,7 @@
                         st.examResults?.[`TKA-${rb.grade}-2`] ?? '',
                         st.examResults?.[`TKA-${rb.grade}-R`] ?? '',
                         Object.keys(st.interaktif || {}).filter(k => k.indexOf(interaktifGradeNum(rb) + '|') === 0 && st.interaktif[k] && st.interaktif[k].done).length,
-                        interaktifLatestExam(st),
+                        (interaktifStats(st, interaktifGradeNum(rb)).quizAvg ?? ''),
                         examViolationTotal(st).total,
                         stamp
                     ]);
