@@ -617,6 +617,8 @@
                 <button type="button" onclick="setAdminTab('teachers')" id="adm-nav-teachers" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-navy text-white cursor-pointer">1. Akun &amp; Lisensi Guru</button>
                 <button type="button" onclick="setAdminTab('tokens')" id="adm-nav-tokens" class="px-4 py-2 rounded-xl text-xs font-extrabold text-navy hover:bg-cream cursor-pointer">2. Generator Token</button>
                 <button type="button" onclick="setAdminTab('config')" id="adm-nav-config" class="px-4 py-2 rounded-xl text-xs font-extrabold text-navy hover:bg-cream cursor-pointer">3. Tampilan Banner &amp; Cloud</button>
+                <button type="button" onclick="setAdminTab('pesanan')" id="adm-nav-pesanan" class="px-4 py-2 rounded-xl text-xs font-extrabold text-navy hover:bg-cream cursor-pointer">💳 Pesanan & Harga</button>
+                <button type="button" onclick="setAdminTab('materi')" id="adm-nav-materi" class="px-4 py-2 rounded-xl text-xs font-extrabold text-navy hover:bg-cream cursor-pointer">🎨 Izin & Materi</button>
             </div>
             <div id="admin-content-area"></div>
         </div>
@@ -3352,8 +3354,147 @@
             safeIcons();
         }
 
+        // =====================================================================
+        // LISENSI GURU: masa berlaku habis -> layar perpanjangan (pesan paket, bayar, pakai kode)
+        // =====================================================================
+        const PAKET_KLIEN = {
+            'PRO-1-BULAN': { label: 'Paket 1 Bulan', days: 30 },
+            'PRO-1-TAHUN': { label: 'Paket 1 Tahun', days: 365 },
+            'PRO-2-TAHUN': { label: 'Paket 2 Tahun', days: 730 }
+        };
+        let lisensiPaket = null;
+        let lisensiBayar = '';
+
+        function hariIni() {
+            const d = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        }
+
+        function lisensiRecord() {
+            const email = state.auth && state.auth.teacherKey;
+            return email ? state.teachers.find(t => normalizeStr(t.email) === normalizeStr(email)) : null;
+        }
+
+        // Dipanggil di awal renderTeacherPortal: true = layar perpanjangan sedang menutup portal
+        function lisensiCek() {
+            const rec = lisensiRecord();
+            const habis = !!(rec && rec.expiresAt && rec.expiresAt < hariIni());
+            if (habis) { lisensiTampil(rec); return true; }
+            const ov = document.getElementById('lisensi-overlay');
+            if (ov) ov.remove();
+            return false;
+        }
+
+        function gasAksi(payload) {
+            if (!getGasUrl()) return Promise.reject(new Error('URL Google Apps Script belum diisi.'));
+            return fetch(getGasUrl(), { method: 'POST', body: JSON.stringify(payload) }).then(r => r.json());
+        }
+
+        function lisensiTampil(rec) {
+            let ov = document.getElementById('lisensi-overlay');
+            if (!ov) {
+                ov = document.createElement('div');
+                ov.id = 'lisensi-overlay';
+                ov.className = 'fixed inset-0 z-[300] bg-slate-900/80 backdrop-blur-sm overflow-y-auto p-3 sm:p-6 flex items-start justify-center';
+                document.body.appendChild(ov);
+            }
+            ov.innerHTML = `<div id="lisensi-body" class="bg-white rounded-3xl w-full max-w-xl p-5 sm:p-7 space-y-4 text-xs text-slate-800 shadow-2xl"></div>`;
+            if (!lisensiPaket) {
+                gasAksi({ action: 'getPrices' }).then(j => { if (j.status === 'ok') { lisensiPaket = j.paket; lisensiBayar = j.paymentInfo || ''; lisensiIsi(rec); } }).catch(() => {});
+            }
+            lisensiIsi(rec);
+        }
+
+        function lisensiIsi(rec) {
+            const box = document.getElementById('lisensi-body');
+            if (!box) return;
+            const email = state.auth.teacherKey;
+            const kodeTersimpan = localStorage.getItem('efn_order_' + email) || '';
+            const paketHtml = lisensiPaket ? Object.keys(PAKET_KLIEN).map(k => {
+                const p = lisensiPaket[k];
+                return `<button type="button" onclick="lisensiPesan('${k}')" class="text-left bg-gradient-to-br from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white rounded-2xl p-3.5 shadow cursor-pointer">
+                    <span class="block font-black text-sm">${p.label}</span>
+                    <span class="block text-[11px] opacity-90">${p.days} hari akses</span>
+                    <span class="block font-black text-base mt-1">Rp ${Number(p.harga).toLocaleString('id-ID')}</span></button>`;
+            }).join('') : '<p class="text-slate-500">Memuat daftar paket...</p>';
+            box.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-wider text-rose-600">Lisensi berakhir</p>
+                        <h3 class="font-display font-black text-lg text-navy">Masa aktif Anda sudah habis</h3>
+                        <p class="text-[11px] text-slate-600">Berakhir pada ${rec && rec.expiresAt ? rec.expiresAt : '-'}. Perpanjang untuk kembali mengelola kelas.</p>
+                    </div>
+                    <button type="button" onclick="logout()" class="shrink-0 bg-slate-100 hover:bg-slate-200 font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">Keluar</button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">${paketHtml}</div>
+                <div id="lisensi-pesanan" class="${kodeTersimpan ? '' : 'hidden'} bg-amber-50 border border-amber-200 rounded-2xl p-3.5 space-y-2">
+                    <p class="font-black text-amber-900">Pesanan Anda: <span class="font-mono">${kodeTersimpan}</span></p>
+                    <p class="text-[11px] text-amber-900 whitespace-pre-line">${lisensiBayar ? escEd(lisensiBayar) : 'Transfer sesuai nominal pesanan ke rekening yang diberikan admin, lalu tekan Cek Pembayaran.'}</p>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="lisensiCekBayar()" class="bg-white border border-amber-300 hover:bg-amber-100 font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">🔄 Cek Pembayaran</button>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-extrabold text-navy">Sudah punya kode aktivasi?</label>
+                    <div class="flex flex-wrap gap-2">
+                        <input id="lisensi-kode" type="text" placeholder="EFN-XXXXXXXX" class="flex-1 min-w-[10rem] border border-slate-300 rounded-xl px-3 py-2 font-mono uppercase">
+                        <button type="button" onclick="lisensiAktifkan(document.getElementById('lisensi-kode').value)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2 rounded-xl cursor-pointer">Aktifkan</button>
+                    </div>
+                </div>`;
+        }
+
+        function lisensiPesan(paket) {
+            const email = state.auth.teacherKey;
+            gasAksi({ action: 'createOrder', email, plan: paket }).then(j => {
+                if (j.status !== 'ok') { showToast('Gagal membuat pesanan: ' + (j.message || '')); return; }
+                localStorage.setItem('efn_order_' + email, j.order.code);
+                lisensiBayar = j.paymentInfo || lisensiBayar;
+                showToast(`Pesanan ${j.order.code} dibuat. Lakukan pembayaran.`);
+                lisensiIsi(lisensiRecord());
+            }).catch(() => showToast('Tidak bisa menghubungi server.'));
+        }
+
+        function lisensiCekBayar() {
+            const email = state.auth.teacherKey;
+            const code = localStorage.getItem('efn_order_' + email);
+            if (!code) { showToast('Belum ada pesanan.'); return; }
+            gasAksi({ action: 'getOrder', email, code }).then(j => {
+                if (j.status !== 'ok') { showToast(j.message || 'Pesanan tidak ditemukan.'); return; }
+                if (j.order.status === 'LUNAS' && j.order.tokenCode) {
+                    showToast('Pembayaran dikonfirmasi. Kode aktivasi diisi otomatis.');
+                    const inp = document.getElementById('lisensi-kode');
+                    if (inp) inp.value = j.order.tokenCode;
+                } else if (j.order.status === 'SELESAI') {
+                    localStorage.removeItem('efn_order_' + email);
+                    showToast('Pesanan ini sudah diaktifkan.');
+                    lisensiIsi(lisensiRecord());
+                } else {
+                    showToast('Pembayaran belum dikonfirmasi admin. Coba lagi nanti.');
+                }
+            }).catch(() => showToast('Tidak bisa menghubungi server.'));
+        }
+
+        function lisensiAktifkan(kode) {
+            const email = state.auth.teacherKey;
+            const code = String(kode || '').trim().toUpperCase();
+            if (!code) { showToast('Masukkan kode aktivasi.'); return; }
+            gasAksi({ action: 'redeemToken', email, code }).then(j => {
+                if (j.status !== 'ok') { showToast(j.message || 'Kode tidak valid.'); return; }
+                const idx = state.teachers.findIndex(t => normalizeStr(t.email) === normalizeStr(email));
+                if (idx >= 0) state.teachers[idx] = Object.assign({}, state.teachers[idx], j.teacherRecord);
+                localStorage.removeItem('efn_order_' + email);
+                persist(true);
+                const ov = document.getElementById('lisensi-overlay');
+                if (ov) ov.remove();
+                renderTeacherPortal();
+                showToast(`Lisensi aktif sampai ${j.teacherRecord.expiresAt}.`);
+            }).catch(() => showToast('Tidak bisa menghubungi server.'));
+        }
+
         function renderTeacherPortal() {
             ensureNotifLoaded();
+            if (state.auth.role === 'teacher' && lisensiCek()) return;
             const sp = getActiveSpace();
             const r = getActiveRombel(sp);
             const allowedGrades = getAllowedGrades(sp);
@@ -3595,13 +3736,36 @@
         let efnEdSel = { g: '8', ci: 0, mi: 0 };
         let efnEdData = null;
 
+        // Guru hanya boleh mengedit jenjang yang ia ampu (VII/VIII/IX -> 7/8/9)
+        const ED_ROMAWI_KE_ANGKA = { VII: '7', VIII: '8', IX: '9' };
+        function edJenjangDiampu(sp) {
+            // Jenjang yang boleh diedit = jenjang yang diampu DAN diizinkan admin (centang izin)
+            const izin = (sp.profile && sp.profile.editGrades) || [];
+            return getAllowedGrades(sp).filter(x => izin.includes(x)).map(x => ED_ROMAWI_KE_ANGKA[x]).filter(Boolean);
+        }
+
+        // Konteks editor: null = guru sendiri; { email, sp } = admin yang mengedit materi guru tertentu
+        let efnEdCtx = null;
+        let efnEdBody = 'doc-module-body';
+        function edSp() { return efnEdCtx ? efnEdCtx.sp : getActiveSpace(); }
+        function edBodyEl() { return document.getElementById(efnEdBody); }
+
+        // Simpan perubahan: guru ke data kelasnya, admin ke server (hanya bagian materi)
+        function edPersist(sp) {
+            if (!efnEdCtx) { persist(); return Promise.resolve(true); }
+            return adminKirim('adminSaveEdits', { email: efnEdCtx.email, edits: sp.interaktifEdits || {} }).then(json => {
+                if (json.status !== 'ok') { showToast('Gagal menyimpan: ' + (json.message || '')); return false; }
+                return true;
+            });
+        }
+
         function escEd(t) {
             return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
         function efnEdRequest(cb) {
             efnEdCb = cb;
-            const sp = getActiveSpace();
+            const sp = edSp();
             if (!efnEdFrame) {
                 efnEdFrame = document.createElement('iframe');
                 efnEdFrame.src = 'belajar.html?mode=guru';
@@ -3610,7 +3774,7 @@
                 efnEdReady = false;
                 return;
             }
-            if (efnEdReady) efnEdFrame.contentWindow.postMessage({ source: 'efn-lms', type: 'getCurriculum', edits: sp.interaktifEdits || {} }, location.origin);
+            if (efnEdReady) efnEdFrame.contentWindow.postMessage({ source: 'efn-lms', type: 'getCurriculum', edits: (sp && sp.interaktifEdits) || {} }, location.origin);
         }
 
         window.addEventListener('message', function (ev) {
@@ -3619,7 +3783,7 @@
             if (!d || d.source !== 'efn-interaktif') return;
             if (d.type === 'ready' && efnEdFrame && ev.source === efnEdFrame.contentWindow) {
                 efnEdReady = true;
-                efnEdFrame.contentWindow.postMessage({ source: 'efn-lms', type: 'getCurriculum', edits: getActiveSpace().interaktifEdits || {} }, location.origin);
+                efnEdFrame.contentWindow.postMessage({ source: 'efn-lms', type: 'getCurriculum', edits: edSp().interaktifEdits || {} }, location.origin);
             }
             if (d.type === 'curriculum') {
                 efnEdData = d.data;
@@ -3629,6 +3793,8 @@
         });
 
         function renderEditInteraktif(bodyEl, sp) {
+            efnEdCtx = null;
+            efnEdBody = 'doc-module-body';
             bodyEl.innerHTML = '<div class="p-6 text-sm text-slate-600 font-bold">⏳ Memuat materi interaktif...</div>';
             efnEdRequest(function () { drawEditInteraktif(bodyEl); });
         }
@@ -3693,6 +3859,12 @@
         function drawEditInteraktif(bodyEl) {
             const sp = getActiveSpace();
             const sel = efnEdSel;
+            const boleh = edJenjangDiampu(sp);
+            if (!boleh.length) {
+                bodyEl.innerHTML = '<div class="p-5 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900">Belum ada izin edit materi untuk jenjang Anda. Hubungi admin untuk mencentang kelas yang boleh Anda edit.</div>';
+                return;
+            }
+            if (!boleh.includes(sel.g)) { sel.g = boleh[0]; sel.ci = 0; sel.mi = 0; }
             const chs = (efnEdData && efnEdData[sel.g]) || [];
             if (!chs.length) { bodyEl.innerHTML = '<p class="text-sm text-red-600 font-bold">Materi belum bisa dimuat. Muat ulang halaman lalu coba lagi.</p>'; return; }
             if (sel.ci >= chs.length) sel.ci = 0;
@@ -3705,13 +3877,19 @@
             const cKey = `${sel.g}|${sel.ci}`;
             const hasM = !!ed[mKey], hasC = !!edc[cKey];
             const fcText = (m.flashcards || []).map(f => [f.word, f.phonetic, f.meaning, f.example].join(' | ')).join('\n');
-            const gradeBtn = g => `<button type="button" onclick="edPilih('${g}',0,0)" class="px-3 py-1.5 rounded-xl text-xs font-extrabold cursor-pointer ${sel.g === g ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-300 text-navy'}">Kelas ${g}</button>`;
+            const gradeBtn = g => {
+                const ok = boleh.includes(g);
+                const cls = !ok ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
+                    : sel.g === g ? 'bg-indigo-600 text-white cursor-pointer' : 'bg-white border border-slate-300 text-navy cursor-pointer';
+                return `<button type="button" ${ok ? `onclick="edPilih('${g}',0,0)"` : 'disabled'} class="px-3 py-1.5 rounded-xl text-xs font-extrabold ${cls}">Kelas ${g}${ok ? '' : ' 🔒'}</button>`;
+            };
             bodyEl.innerHTML = `
                 <div class="space-y-5 text-xs text-slate-800">
                     <div class="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 text-white rounded-2xl p-4">
                         <p class="font-black text-sm">🎨 Edit Materi Interaktif</p>
                         <p class="text-[11px] opacity-90 mt-1">Ubah gambar dan teks bahan belajar yang dilihat siswa di tab 🎮 Interaktif. Perubahan tersimpan di data kelas ini dan ikut tersinkron. Kosongkan perubahan dengan "Kembalikan Bawaan".</p>
                     </div>
+                    <p class="text-[11px] text-slate-600">Anda hanya dapat mengedit jenjang yang diizinkan admin. Jenjang lain dikunci (🔒).</p>
                     <div class="flex flex-wrap gap-2">${[7, 8, 9].map(g => gradeBtn(String(g))).join('')}</div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
@@ -3779,9 +3957,14 @@
                 </div>`;
         }
 
+        function edBolehJenjang(g) {
+            return efnEdCtx ? true : edJenjangDiampu(edSp()).includes(String(g));
+        }
+
         function edPilih(g, ci, mi) {
+            if (!edBolehJenjang(g)) { showToast('Anda tidak mengampu jenjang ini.'); return; }
             efnEdSel = { g: String(g), ci: Number(ci) || 0, mi: Number(mi) || 0 };
-            const bodyEl = document.getElementById('doc-module-body');
+            const bodyEl = edBodyEl();
             if (bodyEl) drawEditInteraktif(bodyEl);
         }
 
@@ -3795,8 +3978,9 @@
         }
 
         function edSimpan() {
-            const sp = getActiveSpace();
+            const sp = edSp();
             const sel = efnEdSel;
+            if (!edBolehJenjang(sel.g)) { showToast('Anda tidak mengampu jenjang ini.'); return; }
             const ed = sp.interaktifEdits || { chapters: {}, meetings: {} };
             ed.chapters = ed.chapters || {};
             ed.meetings = ed.meetings || {};
@@ -3816,19 +4000,18 @@
                 flashcards: fl.length ? fl : undefined
             };
             sp.interaktifEdits = ed;
-            persist();
-            showToast('Perubahan materi disimpan. Siswa melihatnya setelah sinkron.');
-            efnEdRequest(function () { drawEditInteraktif(document.getElementById('doc-module-body')); });
+            edPersist(sp).then(ok => { if (ok) showToast(efnEdCtx ? 'Materi tersimpan di server.' : 'Perubahan materi disimpan. Siswa melihatnya setelah sinkron.'); });
+            efnEdRequest(function () { drawEditInteraktif(edBodyEl()); });
         }
 
         function edKembalikan() {
             if (!confirm('Kembalikan pertemuan ini ke isi bawaan (gambar dan teks)? Bab ini tidak ikut berubah.')) return;
-            const sp = getActiveSpace();
+            const sp = edSp();
             const sel = efnEdSel;
+            if (!edBolehJenjang(sel.g)) { showToast('Anda tidak mengampu jenjang ini.'); return; }
             if (sp.interaktifEdits && sp.interaktifEdits.meetings) delete sp.interaktifEdits.meetings[`${sel.g}|${sel.ci}|${sel.mi}`];
-            persist();
-            showToast('Pertemuan dikembalikan ke isi bawaan.');
-            efnEdRequest(function () { drawEditInteraktif(document.getElementById('doc-module-body')); });
+            edPersist(sp).then(ok => { if (ok) showToast('Pertemuan dikembalikan ke isi bawaan.'); });
+            efnEdRequest(function () { drawEditInteraktif(edBodyEl()); });
         }
 
         function renderWorkspace(modId) {
@@ -5762,6 +5945,168 @@
             safeIcons();
         }
 
+        // ---- Aksi admin ke server (dijaga kunci admin) ----
+        function getAdminKey() {
+            let k = localStorage.getItem('efn_admin_key') || '';
+            if (!k) {
+                k = (window.prompt('Masukkan Kunci Admin (dari Script properties ADMIN_KEY):') || '').trim();
+                if (k) localStorage.setItem('efn_admin_key', k);
+            }
+            return k;
+        }
+
+        function adminKirim(action, payload) {
+            const key = getAdminKey();
+            if (!key) return Promise.resolve({ status: 'error', message: 'Kunci admin belum diisi.' });
+            return gasAksi(Object.assign({ action, adminKey: key }, payload || {})).then(j => {
+                if (j.status !== 'ok' && /Kunci admin/.test(j.message || '')) localStorage.removeItem('efn_admin_key');
+                return j;
+            }).catch(e => ({ status: 'error', message: 'Tidak bisa menghubungi server: ' + e.message }));
+        }
+
+        function adminPesananKonfirmasi(code) {
+            if (!confirm(`Konfirmasi pembayaran untuk pesanan ${code}? Kode aktivasi akan dibuat.`)) return;
+            adminKirim('confirmOrder', { code }).then(j => {
+                if (j.status !== 'ok') { showToast('Gagal: ' + (j.message || '')); return; }
+                showToast(`Pesanan lunas. Kode: ${j.order.tokenCode}`);
+                syncAdminCloud(true).then(() => renderAdminDashboard());
+            });
+        }
+
+        function adminSimpanHarga() {
+            const prices = {};
+            Object.keys(PAKET_KLIEN).forEach(k => {
+                const v = Number(document.getElementById('adm-harga-' + k).value);
+                prices[k] = { harga: isFinite(v) && v >= 0 ? v : 0 };
+            });
+            const paymentInfo = document.getElementById('adm-rekening').value;
+            adminKirim('setPrices', { prices, paymentInfo }).then(j => {
+                if (j.status !== 'ok') { showToast('Gagal: ' + (j.message || '')); return; }
+                showToast('Harga & rekening disimpan.');
+                syncAdminCloud(true).then(() => renderAdminDashboard());
+            });
+        }
+
+        function admSimpanIzin() {
+            const email = document.getElementById('adm-mat-guru').value;
+            const grades = Array.from(document.querySelectorAll('.adm-izin:checked')).map(x => x.value);
+            adminKirim('setPermissions', { email, editGrades: grades }).then(j => {
+                if (j.status !== 'ok') { showToast('Gagal: ' + (j.message || '')); return; }
+                showToast('Izin edit materi disimpan.');
+            });
+        }
+
+        function admBukaEditor() {
+            const email = document.getElementById('adm-mat-guru').value;
+            if (!email) { showToast('Pilih guru terlebih dahulu.'); return; }
+            adminKirim('adminGetSpace', { email }).then(j => {
+                if (j.status !== 'ok') { showToast('Gagal: ' + (j.message || '')); return; }
+                const semua = ['VII', 'VIII', 'IX'];
+                efnEdCtx = { email, sp: { interaktifEdits: j.interaktifEdits || {}, profile: { allowedGrades: semua, editGrades: semua } } };
+                efnEdBody = 'adm-edit-body';
+                efnEdSel = { g: '7', ci: 0, mi: 0 };
+                efnEdRequest(() => { const b = edBodyEl(); if (b) drawEditInteraktif(b); });
+            });
+        }
+
+        function admPesananHtml() {
+            const orders = (state.orders || []).slice().reverse();
+            const paket = state.prices || {};
+            const statusBadge = st => ({
+                MENUNGGU: 'bg-amber-100 text-amber-800', LUNAS: 'bg-emerald-100 text-emerald-800', SELESAI: 'bg-slate-200 text-slate-700'
+            }[st] || 'bg-slate-100');
+            const harga = k => (paket[k] && paket[k].harga) || 0;
+            return `
+                <div class="bg-white border border-cream-border rounded-3xl p-5 shadow-xs space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-display font-extrabold text-base text-navy">Pesanan Perpanjangan Lisensi</h3>
+                        <button type="button" onclick="syncAdminCloud(true).then(() => renderAdminDashboard())" class="bg-slate-100 hover:bg-slate-200 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">↻ Muat Ulang</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                    <table class="doc-table"><thead><tr><th>Kode</th><th>Guru</th><th>Paket</th><th>Nominal</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+                        ${orders.length ? orders.map(o => `<tr>
+                            <td class="font-mono font-bold">${o.code}</td><td>${o.email}</td><td>${(PAKET_KLIEN[o.plan] || {}).label || o.plan}</td>
+                            <td class="text-right">Rp ${Number(o.amount).toLocaleString('id-ID')}</td>
+                            <td class="text-center"><span class="text-[10px] font-black px-2 py-0.5 rounded-full ${statusBadge(o.status)}">${o.status}</span></td>
+                            <td class="text-center">${o.status === 'MENUNGGU' ? `<button type="button" onclick="adminPesananKonfirmasi('${o.code}')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-3 py-1 rounded-lg cursor-pointer">Konfirmasi Lunas</button>` : (o.tokenCode ? `<span class="font-mono text-[11px]">${o.tokenCode}</span>` : '-')}</td>
+                        </tr>`).join('') : '<tr><td colspan="6" class="text-center text-slate-500">Belum ada pesanan.</td></tr>'}
+                    </tbody></table>
+                    </div>
+                    <div class="border-t pt-4 space-y-3">
+                        <h4 class="font-extrabold text-navy">Harga Paket & Rekening Pembayaran</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            ${Object.keys(PAKET_KLIEN).map(k => `<div>
+                                <label class="block text-xs font-bold text-navy mb-1">${PAKET_KLIEN[k].label} (Rp)</label>
+                                <input type="number" min="0" id="adm-harga-${k}" value="${harga(k)}" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                            </div>`).join('')}
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1">Instruksi pembayaran (ditampilkan ke guru)</label>
+                            <textarea id="adm-rekening" rows="3" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white" placeholder="Contoh: Transfer ke BCA 1234567890 a.n. Nama Admin">${escEd(state.paymentInfo || '')}</textarea>
+                        </div>
+                        <button type="button" onclick="adminSimpanHarga()" class="bg-royal text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">Simpan Harga & Rekening</button>
+                    </div>
+                </div>`;
+        }
+
+        function admMateriHtml() {
+            const guru = state.teachers || [];
+            const pilih = guru.length ? guru : [];
+            const first = pilih[0] ? pilih[0].email : '';
+            return `
+                <div class="bg-white border border-cream-border rounded-3xl p-5 shadow-xs space-y-4">
+                    <h3 class="font-display font-extrabold text-base text-navy">Izin & Edit Materi Interaktif</h3>
+                    <p class="text-[11px] text-slate-600">Admin dapat mengedit materi semua jenjang. Centang jenjang untuk memberi izin edit kepada guru. Guru hanya bisa mengedit jenjang yang diizinkan dan yang ia ampu.</p>
+                    ${pilih.length ? `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1">Guru</label>
+                            <select id="adm-mat-guru" onchange="admMateriGuruBerubah()" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                                ${pilih.map(t => `<option value="${t.email}">${t.nama || t.email} (${(t.allowedGrades || []).join(', ')})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-navy mb-1">Izin edit jenjang</label>
+                            <div id="adm-izin-box" class="flex flex-wrap gap-3 text-xs font-bold">${admIzinBox(first)}</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="admSimpanIzin()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">Simpan Izin</button>
+                        <button type="button" onclick="admBukaEditor()" class="bg-royal text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">🎨 Buka Editor Materi (semua jenjang)</button>
+                    </div>
+                    <div id="adm-edit-body" class="pt-2"></div>` : '<p class="text-sm text-slate-500">Belum ada akun guru.</p>'}
+                </div>`;
+        }
+
+        function admIzinBox(email, izinServer) {
+            const t = (state.teachers || []).find(x => x.email === email) || {};
+            const ada = (t.allowedGrades || []);
+            const izin = izinServer || [];
+            return ['VII', 'VIII', 'IX'].map(g => `<label class="inline-flex items-center gap-1.5 ${ada.includes(g) ? '' : 'opacity-40'}">
+                <input type="checkbox" class="adm-izin" value="${g}" ${izin.includes(g) ? 'checked' : ''} ${ada.includes(g) ? '' : 'disabled'}> Kelas ${g}</label>`).join('');
+        }
+
+        function admMateriGuruBerubah() {
+            const email = document.getElementById('adm-mat-guru').value;
+            document.getElementById('adm-izin-box').innerHTML = admIzinBox(email);
+            document.getElementById('adm-edit-body').innerHTML = '';
+            efnEdCtx = null;
+            admLoadIzin(email);
+        }
+
+        // Muat izin edit yang tersimpan di server (hanya bila kunci admin sudah ada di perangkat ini)
+        function admLoadIzin(email) {
+            if (!email || !localStorage.getItem('efn_admin_key')) return;
+            adminKirim('adminGetSpace', { email }).then(j => {
+                if (j.status !== 'ok') return;
+                const sel = document.getElementById('adm-mat-guru');
+                if (!sel || sel.value !== email) return;
+                const box = document.getElementById('adm-izin-box');
+                if (!box) return;
+                box.innerHTML = admIzinBox(email, j.editGrades || []);
+            });
+        }
+
         function renderAdminDashboard() {
             const activeCount = state.teachers.filter(t => t.status === 'ACTIVE').length;
             const totalStudents = Object.values(state.teacherSpaces).reduce((sum, sp) => {
@@ -5787,7 +6132,7 @@
                 </div>
             `;
 
-            ['teachers', 'tokens', 'config'].forEach(t => {
+            ['teachers', 'tokens', 'config', 'pesanan', 'materi'].forEach(t => {
                 const btn = document.getElementById(`adm-nav-${t}`);
                 btn.className = state.adminTab === t
                     ? 'px-4 py-2 rounded-xl text-xs font-extrabold bg-navy text-white cursor-pointer'
@@ -5834,12 +6179,19 @@
                         </table>
                     </div>
                 `;
+            } else if (state.adminTab === 'pesanan') {
+                area.innerHTML = admPesananHtml();
+            } else if (state.adminTab === 'materi') {
+                area.innerHTML = admMateriHtml();
+                const g0 = document.getElementById('adm-mat-guru');
+                if (g0) admLoadIzin(g0.value);
             } else if (state.adminTab === 'tokens') {
                 area.innerHTML = `
                     <div class="bg-white border border-cream-border rounded-3xl p-5 shadow-xs space-y-4">
                         <div class="flex flex-wrap items-center justify-between gap-2">
                             <h3 class="font-display font-extrabold text-base text-navy">Generator Token Lisensi Guru</h3>
-                            <button type="button" onclick="generateNewToken()" class="bg-royal text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">+ Buat Token Baru (365 Hari)</button>
+                            <div class="flex flex-wrap gap-2">${Object.keys(PAKET_KLIEN).map(k => `<button type="button" onclick="generateNewToken('${k}')" class="bg-royal text-white text-xs font-extrabold px-3 py-2 rounded-xl cursor-pointer">+ ${PAKET_KLIEN[k].label} (${PAKET_KLIEN[k].days} hari)</button>`).join('')}</div>
+                            <button type="button" style="display:none" onclick="generateNewToken()" class="bg-royal text-white text-xs font-extrabold px-4 py-2 rounded-xl cursor-pointer">+ Buat Token Baru (365 Hari)</button>
                         </div>
                         <table class="doc-table">
                             <thead>
@@ -5990,9 +6342,10 @@
             showToast('Akun guru dihapus.');
         }
 
-        function generateNewToken() {
+        function generateNewToken(paket = 'PRO-1-TAHUN') {
             const rand = Math.random().toString(36).substring(2, 7).toUpperCase();
-            state.tokens.unshift({ code: `EFN-PRO-${rand}`, plan: 'PRO-1-TAHUN', days: 365, usedBy: '' });
+            const p = PAKET_KLIEN[paket] || PAKET_KLIEN['PRO-1-TAHUN'];
+            state.tokens.unshift({ code: `EFN-${paket.replace('PRO-', '')}-${rand}`, plan: paket, days: p.days, usedBy: '' });
             persist();
             if (getGasUrl()) syncAdminCloud(true);
             renderAdminDashboard();
@@ -6200,6 +6553,12 @@
                         if (json.teacherSpace.uploadedResources?.length) localSp.uploadedResources = json.teacherSpace.uploadedResources;
                     }
                     ensureTkaBanksInSpace(state.teacherSpaces[normEmail]);
+                    if (state.teacherSpaces[normEmail]) {
+                        const tsp = state.teacherSpaces[normEmail];
+                        tsp.profile = tsp.profile || {};
+                        tsp.profile.editGrades = (json.permissions && json.permissions.editGrades) || [];
+                        if (json.teacherSpace.interaktifEdits) tsp.interaktifEdits = json.teacherSpace.interaktifEdits;
+                    }
                     if (json.teacherRecord) {
                         const existingIdx = state.teachers.findIndex(t => normalizeStr(t.email) === normEmail);
                         if (existingIdx >= 0) state.teachers[existingIdx] = json.teacherRecord;
@@ -6294,7 +6653,17 @@
                         const key = normalizeStr(ct.email);
                         if (!mergedMap.has(key)) mergedMap.set(key, ct);
                     });
+                    json.teachers.forEach(ct => {
+                        const key = normalizeStr(ct.email);
+                        const loc = mergedMap.get(key);
+                        if (loc && ct.expiresAt && ct.expiresAt > (loc.expiresAt || '')) {
+                            mergedMap.set(key, Object.assign({}, loc, { plan: ct.plan, expiresAt: ct.expiresAt, status: ct.status }));
+                        }
+                    });
                     state.teachers = Array.from(mergedMap.values());
+                    if (Array.isArray(json.orders)) state.orders = json.orders;
+                    if (json.prices) state.prices = json.prices;
+                    if (json.paymentInfo !== undefined) state.paymentInfo = json.paymentInfo;
                     if (Array.isArray(json.tokens)) {
                         const tokMap = new Map();
                         state.tokens.forEach(tk => tokMap.set(tk.code, tk));
