@@ -2400,6 +2400,54 @@
             efnBackToRoadmap();
         }
 
+        // =====================================================================
+        // EDIT MATERI DARI PORTAL GURU: gambar & teks diterapkan di atas data asli
+        // =====================================================================
+        const EFN_PRISTINE = JSON.parse(JSON.stringify(efnCurriculumByGrade));
+        const EFN_EDIT_CH_FIELDS = ['title', 'heroImg', 'heroCaption'];
+        const EFN_EDIT_M_FIELDS = ['unitTitle', 'summary', 'visualImg', 'visualCaption', 'readingTitle', 'readingText'];
+
+        function efnApplyEdits(edits) {
+            Object.keys(EFN_PRISTINE).forEach(function (g) {
+                efnCurriculumByGrade[g] = JSON.parse(JSON.stringify(EFN_PRISTINE[g]));
+            });
+            if (!edits) return;
+            Object.keys(edits.chapters || {}).forEach(function (k) {
+                var p = k.split('|');
+                var ch = efnCurriculumByGrade[p[0]] && efnCurriculumByGrade[p[0]][p[1]];
+                if (!ch) return;
+                EFN_EDIT_CH_FIELDS.forEach(function (f) { if (edits.chapters[k][f] !== undefined) ch[f] = edits.chapters[k][f]; });
+            });
+            Object.keys(edits.meetings || {}).forEach(function (k) {
+                var p = k.split('|');
+                var m = efnCurriculumByGrade[p[0]] && efnCurriculumByGrade[p[0]][p[1]] && efnCurriculumByGrade[p[0]][p[1]].meetings[p[2]];
+                if (!m) return;
+                var e = edits.meetings[k];
+                EFN_EDIT_M_FIELDS.forEach(function (f) { if (e[f] !== undefined) m[f] = e[f]; });
+                if (Array.isArray(e.flashcards) && e.flashcards.length) m.flashcards = e.flashcards;
+            });
+        }
+
+        // Data kurikulum untuk editor guru (sudah memuat perubahan yang tersimpan)
+        function efnExportCurriculum() {
+            var out = {};
+            Object.keys(efnCurriculumByGrade).forEach(function (g) {
+                out[g] = efnCurriculumByGrade[g].map(function (c) {
+                    return {
+                        title: c.title, heroImg: c.heroImg, heroCaption: c.heroCaption,
+                        meetings: c.meetings.map(function (m) {
+                            return {
+                                unitTitle: m.unitTitle, summary: m.summary, visualImg: m.visualImg, visualCaption: m.visualCaption,
+                                readingTitle: m.readingTitle, readingText: m.readingText,
+                                flashcards: (m.flashcards || []).map(function (f) { return { word: f.word, phonetic: f.phonetic, meaning: f.meaning, example: f.example }; })
+                            };
+                        })
+                    };
+                });
+            });
+            return out;
+        }
+
         // Kembali ke dashboard: di dalam portal LMS diminta induk halaman, di halaman mandiri membuka portal
         function efnBackToDashboard() {
             if (window.parent !== window) {
@@ -3375,8 +3423,21 @@
             if (ev.origin !== location.origin) return;
             var d = ev.data;
             if (!d || d.source !== 'efn-lms') return;
+            if (d.type === 'getCurriculum') {
+                try {
+                    efnApplyEdits(d.edits || {});
+                    ev.source.postMessage({ source: 'efn-interaktif', type: 'curriculum', data: efnExportCurriculum() }, location.origin);
+                } catch (e) { /* abaikan */ }
+                return;
+            }
             if (d.type === 'init' || d.type === 'update') {
                 progress = d.progress || {};
+                if (d.type === 'init' && d.edits !== undefined) {
+                    try {
+                        efnApplyEdits(d.edits);
+                        if (typeof window.efnSelectGrade === 'function') window.efnSelectGrade(efnCurrentGrade);
+                    } catch (e) { /* abaikan */ }
+                }
                 try { decorateRoadmap(); } catch (e) { /* abaikan */ }
             }
         });

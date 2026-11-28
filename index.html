@@ -57,6 +57,19 @@
         }
     </script>
     <style>
+        /* Gaya tambahan halaman pembuka (tidak bergantung pada Tailwind CDN) */
+        .efn-hide { display: none !important; }
+        .efn-card { position: relative; overflow: hidden; isolation: isolate; }
+        .efn-card .efn-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; transition: transform .6s ease; }
+        .efn-card:hover .efn-art { transform: scale(1.06); }
+        .efn-card .efn-tint { position: absolute; inset: 0; z-index: 1; }
+        .efn-card .efn-shade { position: absolute; inset: 0; z-index: 1; background: linear-gradient(to top, rgba(15,23,42,.78) 0%, rgba(15,23,42,.10) 65%, rgba(15,23,42,0) 100%); }
+        .efn-card > :not(.efn-art):not(.efn-tint):not(.efn-shade) { position: relative; z-index: 2; }
+        .efn-tint-ruang { background: linear-gradient(135deg, rgba(109,40,217,.55), rgba(219,39,119,.38)); }
+        .efn-tint-siswa { background: linear-gradient(135deg, rgba(2,132,199,.55), rgba(67,56,202,.45)); }
+        .efn-tint-guru { background: linear-gradient(135deg, rgba(5,150,105,.55), rgba(14,116,144,.45)); }
+        .efn-login-head { background-image: linear-gradient(95deg, rgba(15,23,42,.92), rgba(30,58,138,.78)), url('banner.png'); background-size: cover; background-position: center 30%; }
+        .efn-card-glow { box-shadow: 0 20px 45px -12px rgba(15,23,42,.35); }
         body {
             background: radial-gradient(circle at 50% 0%, #FFFFFF 0%, #F8F7F4 65%, #EFECE4 100%);
             color: #102542;
@@ -290,7 +303,7 @@
 
         <div class="w-full max-w-6xl mx-auto px-4 py-6 sm:py-8">
             <!-- BANNER PANORAMA SEKOLAH CERAH (TERKUNCI - HANYA BISA DIUBAH DARI ADMIN) -->
-            <div class="rounded-[2rem] overflow-hidden shadow-xl border-2 border-white mb-7 bg-white">
+            <div id="login-hero" class="rounded-[2rem] overflow-hidden shadow-xl border-2 border-white mb-7 bg-white">
                 <div class="hero-panorama-frame relative w-full">
                     <img id="dashboard-hero-img" onerror="handleHeroImgFallback(this)"
                         alt="English For Nusantara - Bersama Wujudkan Generasi Hebat"
@@ -319,49 +332,66 @@
             </div>
 
             <!-- PINTU MASUK: 3 BAGIAN (Ruang Pembelajaran • Siswa • Guru) -->
-            <div id="pintu-masuk-utama" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-7">
-                <a href="belajar.html?mode=siswa" class="block bg-white border-2 border-indigo-200 hover:border-indigo-500 rounded-3xl p-5 shadow-md transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xl shrink-0">🎮</div>
-                        <div>
-                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-indigo-600 text-white">Tanpa Login</span>
-                            <h3 class="font-display font-extrabold text-base text-navy mt-1">Ruang Pembelajaran</h3>
+            <div class="relative mb-7">
+                <div class="text-center mb-5">
+                    <p class="text-[11px] font-extrabold uppercase tracking-[0.25em] text-indigo-600">Pilih ruangmu</p>
+                    <h2 class="font-display font-black text-xl sm:text-2xl bg-gradient-to-r from-indigo-600 via-fuchsia-600 to-amber-500 bg-clip-text text-transparent">Mau belajar, latihan, atau mengelola kelas?</h2>
+                </div>
+                <div id="pintu-masuk-utama" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                    <a href="belajar.html?mode=siswa" class="group relative overflow-hidden block rounded-3xl p-5 sm:p-6 text-white shadow-xl bg-gradient-to-br from-teal-400 via-cyan-500 to-indigo-600 hover:-translate-y-1 hover:shadow-2xl transition duration-300">
+                        <span class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/15 group-hover:scale-125 transition duration-500"></span>
+                        <span class="absolute -right-2 bottom-2 w-14 h-14 rounded-full bg-white/10"></span>
+                        <div class="relative flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-2xl shadow-inner">🎮</div>
+                            <div>
+                                <span class="inline-block text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white text-indigo-700">Tanpa Login</span>
+                                <h3 class="font-display font-black text-lg mt-1">Ruang Pembelajaran</h3>
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-xs text-navy-muted mt-3">Belajar langsung lewat slide, kartu kosakata, dan latihan Benar/Salah untuk Kelas VII–IX. Tidak perlu akun; kemajuan tidak dicatat.</p>
-                    <span class="inline-block mt-3 text-xs font-extrabold text-indigo-700">Mulai belajar →</span>
-                </a>
-                <button type="button" onclick="pintuMasuk('siswa')" class="text-left bg-white border-2 border-sky-200 hover:border-royal rounded-3xl p-5 shadow-md transition cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-royal-light text-royal flex items-center justify-center text-xl shrink-0">🎓</div>
-                        <div>
-                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-royal text-white">Login Siswa</span>
-                            <h3 class="font-display font-extrabold text-base text-navy mt-1">Ujian &amp; Latihan</h3>
+                        <p class="relative text-xs sm:text-sm text-white/90 mt-3 leading-relaxed">Belajar lewat slide, kartu kosakata, dan latihan Benar/Salah untuk Kelas VII–IX. Tanpa akun, kemajuan tidak dicatat.</p>
+                        <span class="relative inline-flex items-center gap-1 mt-4 text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl group-hover:bg-white/30">Mulai belajar →</span>
+                    </a>
+                    <button type="button" onclick="pintuMasuk('siswa')" class="group relative overflow-hidden text-left rounded-3xl p-5 sm:p-6 text-white shadow-xl bg-gradient-to-br from-sky-500 via-blue-600 to-violet-600 hover:-translate-y-1 hover:shadow-2xl transition duration-300 cursor-pointer">
+                        <span class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/15 group-hover:scale-125 transition duration-500"></span>
+                        <span class="absolute -right-2 bottom-2 w-14 h-14 rounded-full bg-white/10"></span>
+                        <div class="relative flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-2xl shadow-inner">🎓</div>
+                            <div>
+                                <span class="inline-block text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-300 text-blue-900">Login Siswa</span>
+                                <h3 class="font-display font-black text-lg mt-1">Ujian &amp; Latihan</h3>
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-xs text-navy-muted mt-3">Kerjakan soal UH, STS, SAS, TKA, dan Remedial. Masuk dengan nama lengkap dan PIN.</p>
-                    <span class="inline-block mt-3 text-xs font-extrabold text-royal">Masuk sebagai siswa →</span>
-                </button>
-                <button type="button" onclick="pintuMasuk('guru')" class="text-left bg-white border-2 border-emerald-200 hover:border-emerald-600 rounded-3xl p-5 shadow-md transition cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl shrink-0">👩‍🏫</div>
-                        <div>
-                            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-600 text-white">Login Guru</span>
-                            <h3 class="font-display font-extrabold text-base text-navy mt-1">Kelola Materi &amp; Nilai</h3>
+                        <p class="relative text-xs sm:text-sm text-white/90 mt-3 leading-relaxed">Kerjakan soal UH, STS, SAS, TKA, dan Remedial. Masuk dengan nama lengkap dan PIN.</p>
+                        <span class="relative inline-flex items-center gap-1 mt-4 text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl group-hover:bg-white/30">Masuk sebagai siswa →</span>
+                    </button>
+                    <button type="button" onclick="pintuMasuk('guru')" class="group relative overflow-hidden text-left rounded-3xl p-5 sm:p-6 text-white shadow-xl bg-gradient-to-br from-amber-400 via-orange-500 to-pink-600 hover:-translate-y-1 hover:shadow-2xl transition duration-300 cursor-pointer">
+                        <span class="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/15 group-hover:scale-125 transition duration-500"></span>
+                        <span class="absolute -right-2 bottom-2 w-14 h-14 rounded-full bg-white/10"></span>
+                        <div class="relative flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-white/25 backdrop-blur flex items-center justify-center text-2xl shadow-inner">👩‍🏫</div>
+                            <div>
+                                <span class="inline-block text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white text-orange-700">Login Guru</span>
+                                <h3 class="font-display font-black text-lg mt-1">Kelola Materi &amp; Nilai</h3>
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-xs text-navy-muted mt-3">Masukkan materi, soal, LKPD, dan nilai siswa. Butuh email dan PIN guru.</p>
-                    <span class="inline-block mt-3 text-xs font-extrabold text-emerald-700">Masuk sebagai guru →</span>
-                </button>
+                        <p class="relative text-xs sm:text-sm text-white/90 mt-3 leading-relaxed">Masukkan materi, gambar, soal, LKPD, dan nilai siswa. Butuh email dan PIN guru.</p>
+                        <span class="relative inline-flex items-center gap-1 mt-4 text-xs font-black bg-white/20 px-3 py-1.5 rounded-xl group-hover:bg-white/30">Masuk sebagai guru →</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Bilah kembali: muncul saat kartu login disematkan -->
-            <div id="login-embed-bar" class="hidden mb-4 flex flex-wrap items-center justify-between gap-2">
-                <button type="button" onclick="tutupLogin()" class="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-navy font-extrabold text-xs shadow-sm cursor-pointer">← Kembali ke pilihan</button>
+            <div id="login-embed-bar" class="efn-hide hidden mb-4 flex flex-wrap items-center justify-between gap-2">
+                <button type="button" onclick="tutupLogin()" class="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-navy font-extrabold text-xs shadow-sm cursor-pointer">← Kembali ke beranda</button>
                 <span class="text-[11px] font-bold text-slate-500">Masuk untuk melanjutkan</span>
             </div>
             <!-- Kartu login disematkan di sini saat tombol Login Siswa / Login Guru dipilih -->
-            <div id="login-embed" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+            <div id="login-page-head" class="efn-hide efn-login-head rounded-3xl p-6 sm:p-7 mb-5 text-white efn-card-glow">
+                <span id="login-page-badge" class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/20">Login</span>
+                <h2 id="login-page-title" class="font-display font-extrabold text-2xl sm:text-3xl mt-2">Login</h2>
+                <p id="login-page-sub" class="text-sm text-white/85 mt-1"></p>
+            </div>
+            <div id="login-embed" class="efn-hide hidden grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-stretch">
                 <!-- KARTU 1: PORTAL SISWA (HANYA NAMA & PIN) -->
                 <div id="login-card-siswa" class="bg-white border-2 border-sky-200 hover:border-royal rounded-3xl p-6 sm:p-8 shadow-xl transition flex flex-col justify-between relative overflow-hidden">
                     <div>
@@ -1002,6 +1032,7 @@
             { id: 'promes', title: 'Promes', featured: false },
             { id: 'silabus', title: 'Silabus', featured: false },
             { id: 'modul-ajar', title: 'Modul Ajar / RPP', featured: false },
+            { id: 'edit-interaktif', title: 'Edit Materi Interaktif (Gambar & Teks)', featured: true },
             { id: 'lkpd', title: 'LKPD', featured: false },
             { id: 'bank-soal-uh', title: 'Bank Soal UH', featured: false },
             { id: 'soal-sts', title: 'Soal STS (Tengah Sem)', featured: false },
@@ -1948,7 +1979,7 @@
             const gnum = interaktifGradeNum(r);
             const frame = document.getElementById('efn-interaktif-frame');
             if (d.type === 'ready') {
-                if (frame && frame.contentWindow) frame.contentWindow.postMessage({ source: 'efn-lms', type: 'init', progress: st.interaktif || {} }, location.origin);
+                if (frame && frame.contentWindow) frame.contentWindow.postMessage({ source: 'efn-lms', type: 'init', progress: st.interaktif || {}, edits: (info.sp && info.sp.interaktifEdits) || {} }, location.origin);
                 return;
             }
             if (d.type === 'back') { setStudentTab('materi'); return; }
@@ -2858,34 +2889,78 @@
         // =========================================================================
         // 5. AUTENTIKASI: SISWA (NAMA + PIN), GURU, DAN ADMIN PUSAT
         // =========================================================================
-        // Pintu masuk halaman pembuka: kartu login (siswa / guru) disematkan dan hanya yang dipilih yang tampil
-        function pintuMasuk(peran) {
-            const embed = document.getElementById('login-embed');
-            const bar = document.getElementById('login-embed-bar');
-            const cardSiswa = document.getElementById('login-card-siswa');
-            const cardGuru = document.getElementById('login-card-guru');
-            if (!embed || !cardSiswa || !cardGuru) return;
-            const isGuru = peran === 'guru';
-            cardSiswa.classList.toggle('hidden', isGuru);
-            cardGuru.classList.toggle('hidden', !isGuru);
-            cardSiswa.classList.toggle('lg:col-span-2', !isGuru);
-            cardGuru.classList.toggle('lg:col-span-2', isGuru);
-            embed.classList.remove('hidden');
-            bar.classList.remove('hidden');
-            if (isGuru) switchTeacherTab('login'); else switchStudentTab('login');
-            bar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            const first = (isGuru ? cardGuru : cardSiswa).querySelector('input');
-            setTimeout(() => { if (first) first.focus({ preventScroll: true }); }, 400);
+        // ---- Halaman login terpisah: tiap pilihan membuka halaman sendiri (alamat #login-siswa / #login-guru) ----
+        function setTampil(id, tampil) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle('efn-hide', !tampil);
+            el.classList.toggle('hidden', !tampil);
         }
 
-        // Tutup kartu login yang disematkan dan kembali ke tiga pilihan utama
-        function tutupLogin() {
-            document.getElementById('login-embed').classList.add('hidden');
-            document.getElementById('login-embed-bar').classList.add('hidden');
-            document.getElementById('login-card-siswa').classList.remove('hidden', 'lg:col-span-2');
-            document.getElementById('login-card-guru').classList.remove('hidden', 'lg:col-span-2');
-            document.getElementById('pintu-masuk-utama')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        function tampilkanHalamanLogin(peran) {
+            const isGuru = peran === 'guru';
+            const cardSiswa = document.getElementById('login-card-siswa');
+            const cardGuru = document.getElementById('login-card-guru');
+            if (!cardSiswa || !cardGuru) return;
+            setTampil('login-card-siswa', !isGuru);
+            setTampil('login-card-guru', isGuru);
+            cardSiswa.classList.remove('lg:col-span-2');
+            cardGuru.classList.remove('lg:col-span-2');
+            const embed = document.getElementById('login-embed');
+            embed.classList.remove('lg:grid-cols-2');
+            embed.classList.add('max-w-xl', 'mx-auto', 'w-full');
+            document.getElementById('login-page-title').textContent = isGuru ? 'Login Guru' : 'Login Siswa';
+            document.getElementById('login-page-badge').textContent = isGuru ? 'Portal Guru' : 'Portal Siswa';
+            document.getElementById('login-page-sub').textContent = isGuru
+                ? 'Masuk dengan email dan PIN untuk mengelola materi, soal, LKPD, dan nilai.'
+                : 'Masuk dengan nama lengkap dan PIN untuk mengerjakan UH, STS, SAS, TKA, dan Remedial.';
+            setTampil('login-hero', false);
+            setTampil('pintu-masuk-utama', false);
+            setTampil('login-page-head', true);
+            setTampil('login-embed', true);
+            setTampil('login-embed-bar', true);
+            if (isGuru) switchTeacherTab('login'); else switchStudentTab('login');
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            const first = (isGuru ? cardGuru : cardSiswa).querySelector('input');
+            setTimeout(() => { if (first) first.focus({ preventScroll: true }); }, 300);
         }
+
+        function tampilkanBeranda() {
+            setTampil('login-page-head', false);
+            setTampil('login-embed', false);
+            setTampil('login-embed-bar', false);
+            const embed = document.getElementById('login-embed');
+            embed.classList.add('lg:grid-cols-2');
+            embed.classList.remove('max-w-xl', 'mx-auto', 'w-full');
+            document.getElementById('login-card-siswa').classList.remove('lg:col-span-2');
+            document.getElementById('login-card-guru').classList.remove('lg:col-span-2');
+            setTampil('login-card-siswa', true);
+            setTampil('login-card-guru', true);
+            setTampil('login-hero', true);
+            setTampil('pintu-masuk-utama', true);
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        // Dipanggil dari kartu beranda: membuka halaman login baru (bisa kembali dengan tombol Back browser)
+        function pintuMasuk(peran) {
+            history.pushState({ halaman: peran }, '', '#login-' + (peran === 'guru' ? 'guru' : 'siswa'));
+            tampilkanHalamanLogin(peran === 'guru' ? 'guru' : 'siswa');
+        }
+
+        // Kembali ke beranda dari halaman login
+        function tutupLogin() {
+            history.pushState({ halaman: 'beranda' }, '', location.pathname + location.search);
+            tampilkanBeranda();
+        }
+
+        function terapkanHalamanDariAlamat() {
+            const h = location.hash;
+            if (h === '#login-siswa') tampilkanHalamanLogin('siswa');
+            else if (h === '#login-guru') tampilkanHalamanLogin('guru');
+            else tampilkanBeranda();
+        }
+        window.addEventListener('popstate', terapkanHalamanDariAlamat);
+        window.addEventListener('load', terapkanHalamanDariAlamat);
 
         function switchStudentTab(tab) {
             const isLogin = tab === 'login';
@@ -3508,6 +3583,252 @@
             document.getElementById('tc-workspace-section').classList.add('hidden');
             document.getElementById('tc-grid-section').classList.remove('hidden');
             renderTeacherPortal();
+        }
+
+        // =====================================================================
+        // EDITOR MATERI INTERAKTIF (portal guru): gambar & teks bahan belajar siswa
+        // Kurikulum diambil dari belajar.html (iframe tersembunyi), perubahan disimpan di sp.interaktifEdits
+        // =====================================================================
+        let efnEdFrame = null;
+        let efnEdReady = false;
+        let efnEdCb = null;
+        let efnEdSel = { g: '8', ci: 0, mi: 0 };
+        let efnEdData = null;
+
+        function escEd(t) {
+            return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function efnEdRequest(cb) {
+            efnEdCb = cb;
+            const sp = getActiveSpace();
+            if (!efnEdFrame) {
+                efnEdFrame = document.createElement('iframe');
+                efnEdFrame.src = 'belajar.html?mode=guru';
+                efnEdFrame.style.display = 'none';
+                document.body.appendChild(efnEdFrame);
+                efnEdReady = false;
+                return;
+            }
+            if (efnEdReady) efnEdFrame.contentWindow.postMessage({ source: 'efn-lms', type: 'getCurriculum', edits: sp.interaktifEdits || {} }, location.origin);
+        }
+
+        window.addEventListener('message', function (ev) {
+            if (ev.origin !== location.origin) return;
+            const d = ev.data;
+            if (!d || d.source !== 'efn-interaktif') return;
+            if (d.type === 'ready' && efnEdFrame && ev.source === efnEdFrame.contentWindow) {
+                efnEdReady = true;
+                efnEdFrame.contentWindow.postMessage({ source: 'efn-lms', type: 'getCurriculum', edits: getActiveSpace().interaktifEdits || {} }, location.origin);
+            }
+            if (d.type === 'curriculum') {
+                efnEdData = d.data;
+                const cb = efnEdCb; efnEdCb = null;
+                if (cb) cb();
+            }
+        });
+
+        function renderEditInteraktif(bodyEl, sp) {
+            bodyEl.innerHTML = '<div class="p-6 text-sm text-slate-600 font-bold">⏳ Memuat materi interaktif...</div>';
+            efnEdRequest(function () { drawEditInteraktif(bodyEl); });
+        }
+
+        function edImgBlock(id, label, value) {
+            return `
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-extrabold text-navy">${label}</label>
+                    <div class="flex flex-wrap items-start gap-3">
+                        <img id="${id}-prev" src="${escEd(value)}" alt="" class="${value ? '' : 'hidden'} w-40 h-24 object-cover rounded-xl border border-slate-200 bg-slate-50">
+                        <div class="flex-1 min-w-[12rem] space-y-1.5">
+                            <input type="text" id="${id}" value="${escEd(value)}" placeholder="Tempel alamat gambar (https://...) atau unggah file" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 text-xs bg-white">
+                            <label class="inline-flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-800 text-xs font-extrabold px-3 py-1.5 rounded-xl cursor-pointer">
+                                ⬆ Unggah Gambar
+                                <input type="file" accept="image/*" class="hidden" onchange="edUnggahGambar(event, '${id}')">
+                            </label>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function edResizeImage(file, maxW, quality) {
+            return new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onerror = reject;
+                reader.onload = function () {
+                    const img = new Image();
+                    img.onerror = reject;
+                    img.onload = function () {
+                        const scale = Math.min(1, maxW / img.width);
+                        const cv = document.createElement('canvas');
+                        cv.width = Math.round(img.width * scale);
+                        cv.height = Math.round(img.height * scale);
+                        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+                        resolve(cv.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function edUnggahGambar(ev, id) {
+            const file = ev.target.files && ev.target.files[0];
+            if (!file) return;
+            try {
+                let url = await edResizeImage(file, 1000, 0.82);
+                if (url.length > 350000) url = await edResizeImage(file, 800, 0.6);
+                if (url.length > 500000) { showToast('Gambar terlalu besar. Pilih gambar yang lebih kecil.'); return; }
+                document.getElementById(id).value = url;
+                const prev = document.getElementById(id + '-prev');
+                prev.src = url;
+                prev.classList.remove('hidden');
+                showToast('Gambar siap. Klik Simpan Perubahan.');
+            } catch (e) {
+                showToast('Gagal membaca gambar.');
+            } finally {
+                ev.target.value = '';
+            }
+        }
+
+        function drawEditInteraktif(bodyEl) {
+            const sp = getActiveSpace();
+            const sel = efnEdSel;
+            const chs = (efnEdData && efnEdData[sel.g]) || [];
+            if (!chs.length) { bodyEl.innerHTML = '<p class="text-sm text-red-600 font-bold">Materi belum bisa dimuat. Muat ulang halaman lalu coba lagi.</p>'; return; }
+            if (sel.ci >= chs.length) sel.ci = 0;
+            const ch = chs[sel.ci];
+            if (sel.mi >= ch.meetings.length) sel.mi = 0;
+            const m = ch.meetings[sel.mi];
+            const ed = (sp.interaktifEdits && sp.interaktifEdits.meetings) || {};
+            const edc = (sp.interaktifEdits && sp.interaktifEdits.chapters) || {};
+            const mKey = `${sel.g}|${sel.ci}|${sel.mi}`;
+            const cKey = `${sel.g}|${sel.ci}`;
+            const hasM = !!ed[mKey], hasC = !!edc[cKey];
+            const fcText = (m.flashcards || []).map(f => [f.word, f.phonetic, f.meaning, f.example].join(' | ')).join('\n');
+            const gradeBtn = g => `<button type="button" onclick="edPilih('${g}',0,0)" class="px-3 py-1.5 rounded-xl text-xs font-extrabold cursor-pointer ${sel.g === g ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-300 text-navy'}">Kelas ${g}</button>`;
+            bodyEl.innerHTML = `
+                <div class="space-y-5 text-xs text-slate-800">
+                    <div class="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 text-white rounded-2xl p-4">
+                        <p class="font-black text-sm">🎨 Edit Materi Interaktif</p>
+                        <p class="text-[11px] opacity-90 mt-1">Ubah gambar dan teks bahan belajar yang dilihat siswa di tab 🎮 Interaktif. Perubahan tersimpan di data kelas ini dan ikut tersinkron. Kosongkan perubahan dengan "Kembalikan Bawaan".</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">${[7, 8, 9].map(g => gradeBtn(String(g))).join('')}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Bab</label>
+                            <select id="ed-ci" onchange="edPilih('${sel.g}', this.value, 0)" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                                ${chs.map((c, i) => `<option value="${i}" ${i === sel.ci ? 'selected' : ''}>${escEd(c.title)}${edc[`${sel.g}|${i}`] ? ' ✎' : ''}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Pertemuan</label>
+                            <select id="ed-mi" onchange="edPilih('${sel.g}', ${sel.ci}, this.value)" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">
+                                ${ch.meetings.map((x, i) => `<option value="${i}" ${i === sel.mi ? 'selected' : ''}>${i + 1}. ${escEd(x.unitTitle)}${ed[`${sel.g}|${sel.ci}|${i}`] ? ' ✎' : ''}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <p class="font-black text-navy text-sm">Sampul bab ${hasC ? '<span class="text-amber-600">(sudah diubah)</span>' : ''}</p>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Judul bab</label>
+                            <input type="text" id="ed-ch-title" value="${escEd(ch.title)}" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Keterangan gambar sampul</label>
+                            <input type="text" id="ed-ch-heroCaption" value="${escEd(ch.heroCaption)}" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 bg-white">
+                        </div>
+                        ${edImgBlock('ed-ch-heroImg', 'Gambar sampul bab', ch.heroImg)}
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+                        <p class="font-black text-navy text-sm">Pertemuan ${sel.mi + 1} ${hasM ? '<span class="text-amber-600">(sudah diubah)</span>' : ''}</p>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Judul pertemuan</label>
+                            <input type="text" id="ed-m-unitTitle" value="${escEd(m.unitTitle)}" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Ringkasan pertemuan</label>
+                            <textarea id="ed-m-summary" rows="2" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">${escEd(m.summary)}</textarea>
+                        </div>
+                        ${edImgBlock('ed-m-visualImg', 'Gambar pertemuan (slide konteks)', m.visualImg)}
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Keterangan gambar</label>
+                            <input type="text" id="ed-m-visualCaption" value="${escEd(m.visualCaption)}" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 bg-white">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-extrabold text-navy mb-1">Judul teks bacaan</label>
+                                <input type="text" id="ed-m-readingTitle" value="${escEd(m.readingTitle)}" class="w-full border border-slate-300 rounded-xl px-3 py-1.5 bg-white">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Teks bacaan</label>
+                            <textarea id="ed-m-readingText" rows="5" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white">${escEd(m.readingText)}</textarea>
+                        </div>
+                        <div>
+                            <label class="block font-extrabold text-navy mb-1">Kosakata (satu per baris: kata | fonetik | arti | contoh kalimat)</label>
+                            <textarea id="ed-m-flash" rows="5" class="w-full border border-slate-300 rounded-xl px-3 py-2 bg-white font-mono">${escEd(fcText)}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="edSimpan()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-5 py-2.5 rounded-xl cursor-pointer">💾 Simpan Perubahan</button>
+                        <button type="button" onclick="edKembalikan()" class="bg-white border border-slate-300 hover:bg-slate-50 text-navy font-extrabold px-4 py-2.5 rounded-xl cursor-pointer">↺ Kembalikan Bawaan (pertemuan ini)</button>
+                    </div>
+                </div>`;
+        }
+
+        function edPilih(g, ci, mi) {
+            efnEdSel = { g: String(g), ci: Number(ci) || 0, mi: Number(mi) || 0 };
+            const bodyEl = document.getElementById('doc-module-body');
+            if (bodyEl) drawEditInteraktif(bodyEl);
+        }
+
+        function edKumpulFlash(text) {
+            const out = [];
+            String(text || '').split('\n').forEach(line => {
+                const parts = line.split('|').map(x => x.trim());
+                if (parts.length >= 4 && parts[0] && parts[2]) out.push({ word: parts[0], phonetic: parts[1], meaning: parts[2], example: parts.slice(3).join(' | ') });
+            });
+            return out;
+        }
+
+        function edSimpan() {
+            const sp = getActiveSpace();
+            const sel = efnEdSel;
+            const ed = sp.interaktifEdits || { chapters: {}, meetings: {} };
+            ed.chapters = ed.chapters || {};
+            ed.meetings = ed.meetings || {};
+            ed.chapters[`${sel.g}|${sel.ci}`] = {
+                title: document.getElementById('ed-ch-title').value.trim(),
+                heroCaption: document.getElementById('ed-ch-heroCaption').value.trim(),
+                heroImg: document.getElementById('ed-ch-heroImg').value.trim()
+            };
+            const fl = edKumpulFlash(document.getElementById('ed-m-flash').value);
+            ed.meetings[`${sel.g}|${sel.ci}|${sel.mi}`] = {
+                unitTitle: document.getElementById('ed-m-unitTitle').value.trim(),
+                summary: document.getElementById('ed-m-summary').value.trim(),
+                visualImg: document.getElementById('ed-m-visualImg').value.trim(),
+                visualCaption: document.getElementById('ed-m-visualCaption').value.trim(),
+                readingTitle: document.getElementById('ed-m-readingTitle').value.trim(),
+                readingText: document.getElementById('ed-m-readingText').value.trim(),
+                flashcards: fl.length ? fl : undefined
+            };
+            sp.interaktifEdits = ed;
+            persist();
+            showToast('Perubahan materi disimpan. Siswa melihatnya setelah sinkron.');
+            efnEdRequest(function () { drawEditInteraktif(document.getElementById('doc-module-body')); });
+        }
+
+        function edKembalikan() {
+            if (!confirm('Kembalikan pertemuan ini ke isi bawaan (gambar dan teks)? Bab ini tidak ikut berubah.')) return;
+            const sp = getActiveSpace();
+            const sel = efnEdSel;
+            if (sp.interaktifEdits && sp.interaktifEdits.meetings) delete sp.interaktifEdits.meetings[`${sel.g}|${sel.ci}|${sel.mi}`];
+            persist();
+            showToast('Pertemuan dikembalikan ke isi bawaan.');
+            efnEdRequest(function () { drawEditInteraktif(document.getElementById('doc-module-body')); });
         }
 
         function renderWorkspace(modId) {
@@ -4286,6 +4607,10 @@
                     break;
                 }
 
+                case 'edit-interaktif': {
+                    renderEditInteraktif(bodyEl, sp);
+                    break;
+                }
                 case 'paket-supervisi':
                 case 'template-kelas':
                 default: {
@@ -5919,6 +6244,7 @@
                         if (json.teacherSpace.exams) localSp.exams = json.teacherSpace.exams;
                         if (json.teacherSpace.uploadedResources) localSp.uploadedResources = json.teacherSpace.uploadedResources;
                         if (json.teacherSpace.curriculum) localSp.curriculum = json.teacherSpace.curriculum;
+                        if (json.teacherSpace.interaktifEdits) localSp.interaktifEdits = json.teacherSpace.interaktifEdits;
                     }
                     ensureTkaBanksInSpace(state.teacherSpaces[tKey]);
                     persist(true);
