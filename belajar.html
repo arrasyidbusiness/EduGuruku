@@ -94,6 +94,8 @@
         <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-2">
             <!-- Kiri: Brand, Pemilih Jenjang Kelas, Dropdown Chapter & Navigasi Peta -->
             <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="efnBackToDashboard()" title="Kembali ke dashboard portal"
+                    class="px-2.5 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-navy font-extrabold text-xs transition cursor-pointer">🏠 Dashboard</button>
                 <button type="button" onclick="efnBackToRoadmap()"
                     class="flex items-center gap-2 text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition cursor-pointer">
                     <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-sm">EFN</span>
@@ -2230,6 +2232,96 @@
             ]
         };
 
+        // =====================================================================
+        // PENYESUAIAN BAB & PERTEMUAN
+        // 1) Kelas VIII disusun menjadi 5 bab sesuai buku (Chapter 4 No Littering, Chapter 5 Embrace Yourself).
+        // 2) Setiap bab memiliki 8 pertemuan: pertemuan dari buku lalu pertemuan penguatan yang dibuat
+        //    dari kosakata, pola tata bahasa, dan kalimat pada bab itu sendiri (diberi label "Penguatan").
+        // =====================================================================
+        (function efnTataUlangBabKelas8() {
+            const g8 = efnCurriculumByGrade['8'];
+            if (!g8 || g8.length !== 4) return;
+            const c4 = g8[3];
+            const embrace = c4.meetings.find(m => /Embrace Yourself/.test(m.unitTitle));
+            const littering = c4.meetings.find(m => /No Littering/.test(m.unitTitle));
+            if (!embrace || !littering) return;
+            c4.title = 'Chapter 4: No Littering';
+            c4.id = 'g8-ch4';
+            c4.theme = 'Environmental Care • Past Continuous Tense';
+            c4.desc = 'Mencegah dan membersihkan sampah demi lingkungan yang sehat.';
+            c4.meetings = [littering];
+            g8.push({
+                id: 'g8-ch5',
+                title: 'Chapter 5: Embrace Yourself',
+                theme: 'Personal Confidence • Positive Affirmations & Recount',
+                desc: 'Membangun rasa percaya diri lewat teks recount dan afirmasi positif.',
+                heroImg: embrace.visualImg,
+                heroCaption: 'Be Yourself: percaya diri dengan keunikan diri sendiri',
+                meetings: [embrace]
+            });
+        })();
+
+        (function efnLengkapiPertemuanPerBab() {
+            const TARGET = 8;
+            const ORDER = ['kosakata', 'tata', 'susun'];
+            const LABEL = { kosakata: 'Penguatan Kosakata', tata: 'Penguatan Tata Bahasa', susun: 'Latihan Menyusun Kalimat' };
+            const pick = (arr, start, n) => {
+                const out = [];
+                if (!arr.length) return out;
+                for (let i = 0; i < Math.min(n, arr.length); i++) out.push(arr[(start + i) % arr.length]);
+                return out;
+            };
+            // Soal pilihan ganda arti kosakata: jawaban benar diletakkan bergantian, pengecoh dari kosakata bab yang sama
+            const mcArti = (f, pool, i) => {
+                const others = [];
+                for (let t = 1; t < pool.length && others.length < 3; t++) {
+                    const cand = pool[(i + t) % pool.length].meaning;
+                    if (cand !== f.meaning && others.indexOf(cand) < 0) others.push(cand);
+                }
+                if (!others.length) return null;
+                const pos = i % (others.length + 1);
+                const options = others.slice();
+                options.splice(pos, 0, f.meaning);
+                return { question: `Apa arti kata "${f.word}"?`, options: options, answer: pos, explanation: `"${f.word}" berarti "${f.meaning}". Contoh: ${f.example}` };
+            };
+            Object.keys(efnCurriculumByGrade).forEach(g => efnCurriculumByGrade[g].forEach(ch => {
+                const base = ch.meetings[0];
+                if (!base) return;
+                const vocab = [], seen = {}, quizPool = [], sentPool = [];
+                ch.meetings.forEach(m => {
+                    (m.flashcards || []).forEach(f => { if (!seen[f.word]) { seen[f.word] = true; vocab.push(f); } });
+                    (m.quizzes || []).forEach(q => quizPool.push(q));
+                    (m.sentences || []).forEach(x => sentPool.push(x));
+                });
+                let k = 0;
+                while (ch.meetings.length < TARGET) {
+                    k++;
+                    const type = ORDER[(k - 1) % ORDER.length];
+                    const j = Math.floor((k - 1) / ORDER.length);
+                    const m = JSON.parse(JSON.stringify(base));
+                    m.unitTitle = `Pertemuan ${ch.meetings.length + 1} — ${LABEL[type]}`;
+                    m.penguatan = true;
+                    if (type === 'kosakata') {
+                        const slice = pick(vocab, j * 4, 4);
+                        m.flashcards = slice;
+                        m.quizzes = slice.map((f, i) => mcArti(f, vocab, i)).filter(Boolean);
+                        m.summary = `Memperkuat kosakata kunci bab ini: ${slice.map(f => f.word).join(', ')}.`;
+                        m.skillFocus = 'Vocabulary • Kosakata kunci bab';
+                    } else if (type === 'tata') {
+                        m.quizzes = pick(quizPool, j * 3, 3);
+                        m.summary = 'Mengulang pola tata bahasa bab ini melalui soal pilihan ganda.';
+                        m.skillFocus = 'Grammar • Latihan pola kalimat bab';
+                    } else {
+                        const sents = pick(sentPool, j * 2, 2);
+                        if (sents.length) { m.sentences = sents; m.builderWords = sents[0].en.split(' '); }
+                        m.summary = 'Menyusun kalimat utuh dari potongan kata sesuai contoh bab ini.';
+                        m.skillFocus = 'Writing • Menyusun kalimat';
+                    }
+                    ch.meetings.push(m);
+                }
+            }));
+        })();
+
         // Bank Soal CBT per Jenjang Kelas (VII, VIII, IX)
         
 
@@ -2306,6 +2398,15 @@
             const select = document.getElementById('efn-chapter-select');
             if (select) select.value = String(efnCurrentChapterIdx);
             efnBackToRoadmap();
+        }
+
+        // Kembali ke dashboard: di dalam portal LMS diminta induk halaman, di halaman mandiri membuka portal
+        function efnBackToDashboard() {
+            if (window.parent !== window) {
+                window.parent.postMessage({ source: 'efn-interaktif', type: 'back' }, location.origin);
+                return;
+            }
+            window.location.href = 'index.html';
         }
 
         function efnBackToRoadmap() {

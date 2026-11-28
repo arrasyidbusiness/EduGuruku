@@ -1873,7 +1873,28 @@
             return { done, quizAvg };
         }
 
+        // Kelas VIII: bab 4 lama (Embrace Yourself + No Littering) dipisah menjadi bab 4 No Littering dan bab 5 Embrace Yourself.
+        // Progres lama dipetakan ulang sekali: indeks 8|3|0 (Embrace) -> 8|4|0, 8|3|1 (No Littering) -> 8|3|0.
+        function migrateInteraktifV2(st) {
+            if (!st || st.interaktifV2) return false;
+            st.interaktifV2 = true;
+            if (!st.interaktif) return false;
+            const out = {};
+            let changed = false;
+            Object.keys(st.interaktif).forEach(k => {
+                let nk = k;
+                if (k.indexOf('8|3|') === 0) {
+                    nk = Number(k.split('|')[2]) === 0 ? '8|4|0' : '8|3|0';
+                    changed = true;
+                }
+                out[nk] = st.interaktif[k];
+            });
+            if (changed) st.interaktif = out;
+            return changed;
+        }
+
         function renderInteraktifSummary(st, gnum) {
+            if (migrateInteraktifV2(st)) persist(true);
             const box = document.getElementById('interaktif-summary');
             if (!box) return;
             const sm = interaktifStats(st, gnum);
@@ -1923,12 +1944,14 @@
             let info;
             try { info = getLoggedStudent(); } catch (e) { return; }
             const { r, st } = info;
+            if (migrateInteraktifV2(st)) persist(true);
             const gnum = interaktifGradeNum(r);
             const frame = document.getElementById('efn-interaktif-frame');
             if (d.type === 'ready') {
                 if (frame && frame.contentWindow) frame.contentWindow.postMessage({ source: 'efn-lms', type: 'init', progress: st.interaktif || {} }, location.origin);
                 return;
             }
+            if (d.type === 'back') { setStudentTab('materi'); return; }
             if (d.type === 'meeting_done' || d.type === 'quiz' || d.type === 'builder') {
                 const x = d.data || {};
                 if (x.grade !== gnum) return;
